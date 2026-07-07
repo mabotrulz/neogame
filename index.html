@@ -883,9 +883,11 @@ function finishLoadPhrase(letterData, words, phrase, shuffled) {
   });
 
   updateStats();
-  resetHintTimer();
-  setTimeout(pigIdle, 2000 + Math.random() * 2000);
-  setTimeout(announceNextLetter, 800);
+  if (_gameStarted) {
+    resetHintTimer();
+    setTimeout(pigIdle, 2000 + Math.random() * 2000);
+    setTimeout(announceNextLetter, 800);
+  }
 }
 
 function handleDrop(e, slotIdx) {
