@@ -12,319 +12,311 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    min-height: 100dvh;
+    min-height: 100vh; min-height: 100dvh;
     overflow: hidden;
     touch-action: none;
     user-select: none;
   }
 
   .game {
-    width: 100vw;
-    height: 100vh;
-    height: 100dvh;
+    width: 100vw; height: 100vh; height: 100dvh;
     max-width: 800px;
-    background: linear-gradient(135deg, #16213e, #0f3460);
+    background: linear-gradient(180deg, #87CEEB 0%, #98D8E8 40%, #b8e6b8 70%, #7ec850 100%);
     display: flex;
     flex-direction: column;
     position: relative;
     overflow: hidden;
   }
 
+  /* Sky decorations */
+  .sky-clouds {
+    position: absolute; inset: 0;
+    pointer-events: none; overflow: hidden;
+    z-index: 0;
+  }
+  .cloud {
+    position: absolute;
+    background: rgba(255,255,255,0.6);
+    border-radius: 50px;
+    animation: cloudDrift linear infinite;
+  }
+  @keyframes cloudDrift {
+    0% { transform: translateX(-150px); }
+    100% { transform: translateX(calc(100vw + 150px)); }
+  }
+
   .header {
-    text-align: center;
-    padding: 16px 16px 6px;
-    flex-shrink: 0;
+    text-align: center; padding: 12px 12px 4px;
+    flex-shrink: 0; position: relative; z-index: 1;
   }
   .header h1 {
-    color: #e94560;
-    font-size: clamp(14px, 3.5vw, 22px);
-    font-weight: 700;
-    letter-spacing: 2px;
+    color: #c0392b; font-size: clamp(13px, 3vw, 20px);
+    font-weight: 900; letter-spacing: 1px;
+    text-shadow: 2px 2px 0 #e74c3c33;
   }
   .header .hint {
-    color: #888;
-    font-size: clamp(10px, 2vw, 13px);
-    margin-top: 2px;
-    min-height: 18px;
+    color: #555; font-size: clamp(9px, 1.8vw, 12px);
+    margin-top: 2px; min-height: 16px;
+  }
+
+  /* Bird track */
+  .track-area {
+    flex-shrink: 0; position: relative; z-index: 1;
+    height: clamp(50px, 12vw, 80px);
+    margin: 0 16px;
+    border-bottom: 3px solid #8B4513;
+    background: linear-gradient(180deg, transparent 60%, rgba(139,69,19,0.1) 100%);
+  }
+  .track-line {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: #8B4513;
+  }
+  .track-start, .track-end {
+    position: absolute;
+    bottom: -12px;
+    font-size: clamp(18px, 4vw, 28px);
+  }
+  .track-start { left: 0; }
+  .track-end { right: 0; }
+
+  .bird {
+    position: absolute;
+    bottom: 8px;
+    font-size: clamp(28px, 6vw, 42px);
+    transition: left 0.5s cubic-bezier(0.34, 1.2, 0.64, 1);
+    z-index: 2;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  }
+  .bird.hop { animation: birdHop 0.3s ease; }
+  @keyframes birdHop {
+    0%,100% { transform: translateY(0) scaleX(1); }
+    50% { transform: translateY(-12px) scaleX(0.85); }
+  }
+
+  .pig-on-track {
+    position: absolute;
+    bottom: 6px;
+    right: 0;
+    font-size: clamp(24px, 5vw, 36px);
+    z-index: 2;
+    transition: all 0.3s;
+  }
+  .pig-on-track.scared {
+    animation: pigShake 0.4s ease;
+  }
+  @keyframes pigShake {
+    0%,100% { transform: translateY(0); }
+    25% { transform: translateY(-4px); }
+    75% { transform: translateY(4px); }
+  }
+
+  /* Pig fly animation */
+  .pig-fly {
+    position: fixed;
+    z-index: 200;
+    pointer-events: none;
+    font-size: 60px;
+    transform: translate(-50%, -50%);
+    left: 50%; top: 50%;
+    transition: none;
+    animation: pigGrow 1.5s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+  }
+  @keyframes pigGrow {
+    0%   { font-size: 60px; opacity: 0; transform: translate(-50%,-50%) scale(0.3) rotate(-10deg); }
+    20%  { opacity: 1; transform: translate(-50%,-50%) scale(0.8) rotate(5deg); }
+    60%  { font-size: clamp(200px, 70vw, 500px); transform: translate(-50%,-50%) scale(1) rotate(-3deg); opacity: 1; }
+    80%  { font-size: clamp(200px, 70vw, 500px); transform: translate(-50%,-50%) scale(1.1) rotate(3deg); opacity: 1; }
+    100% { font-size: clamp(200px, 70vw, 500px); transform: translate(-50%, 120vh) scale(1) rotate(15deg); opacity: 1; }
   }
 
   .stats {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    padding: 4px 16px 8px;
-    flex-shrink: 0;
+    display: flex; justify-content: center; gap: 16px;
+    padding: 2px 12px 4px; flex-shrink: 0; position: relative; z-index: 1;
   }
   .stats .stat { text-align: center; }
   .stats .stat .val {
-    font-size: clamp(22px, 5vw, 32px);
-    font-weight: 700;
-    color: #fff;
+    font-size: clamp(18px, 4vw, 26px); font-weight: 700; color: #fff;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
   }
   .stats .stat .label {
-    font-size: clamp(8px, 1.8vw, 11px);
-    color: #888;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    font-size: clamp(7px, 1.5vw, 10px); color: #ddd;
+    text-transform: uppercase; letter-spacing: 1px;
   }
 
-  /* Letter slots */
+  /* Slots */
   .slots-area {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 8px 12px;
-    gap: 6px;
-    min-height: 0;
-  }
-  .phrase-label {
-    color: #666;
-    font-size: clamp(10px, 2vw, 12px);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 4px;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    padding: 4px 8px; gap: 4px;
+    min-height: 0; position: relative; z-index: 1;
   }
   .slots-row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 6px;
-    padding: 4px;
+    display: flex; flex-wrap: wrap;
+    justify-content: center; gap: 5px; padding: 4px;
   }
-  .word-group {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-  }
+  .word-group { display: flex; gap: 5px; align-items: center; }
   .word-group + .word-group::before {
-    content: '';
-    display: inline-block;
-    width: 12px;
+    content: ''; display: inline-block; width: 10px;
   }
-
   .slot {
-    width: clamp(32px, 8vw, 52px);
-    height: clamp(38px, 9vw, 56px);
-    border: 2.5px dashed #4ecca3;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: clamp(18px, 5vw, 30px);
-    font-weight: 700;
-    color: #4ecca3;
+    width: clamp(28px, 7vw, 44px);
+    height: clamp(34px, 8vw, 48px);
+    border: 2.5px dashed #fff;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(16px, 4vw, 26px); font-weight: 700;
+    color: #fff;
     transition: all 0.25s;
-    background: rgba(78, 204, 163, 0.05);
+    background: rgba(255,255,255,0.1);
     position: relative;
   }
   .slot.filled {
     border-style: solid;
-    background: rgba(78, 204, 163, 0.18);
-    animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    background: rgba(255,255,255,0.2);
+    animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
   }
   .slot.wrong {
-    border-color: #e94560;
-    background: rgba(233, 69, 96, 0.15);
+    border-color: #e74c3c;
+    background: rgba(231,76,60,0.2);
     animation: shake 0.35s ease;
   }
   .slot.drag-over {
-    border-color: #ffd700;
-    background: rgba(255, 215, 0, 0.1);
+    border-color: #f1c40f;
+    background: rgba(241,196,15,0.15);
     transform: scale(1.08);
   }
   .slot.space {
-    border: none;
-    background: transparent;
-    width: clamp(8px, 2vw, 16px);
-    height: auto;
-    pointer-events: none;
+    border: none; background: transparent;
+    width: 6px; height: auto; pointer-events: none;
   }
-
   @keyframes popIn {
     0% { transform: scale(0.7); }
     100% { transform: scale(1); }
   }
   @keyframes shake {
     0%,100% { transform: translateX(0); }
-    20% { transform: translateX(-6px); }
-    40% { transform: translateX(6px); }
-    60% { transform: translateX(-4px); }
-    80% { transform: translateX(4px); }
+    20% { transform: translateX(-5px); }
+    40% { transform: translateX(5px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(3px); }
   }
 
-  /* Letter pool */
   .letter-pool {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 6px;
-    padding: 10px 12px;
-    flex-shrink: 0;
-    min-height: 56px;
-    max-height: 180px;
-    overflow-y: auto;
+    display: flex; flex-wrap: wrap;
+    justify-content: center; gap: 5px;
+    padding: 6px 10px;
+    flex-shrink: 0; min-height: 44px; max-height: 120px;
+    overflow-y: auto; position: relative; z-index: 1;
   }
-
   .letter {
-    width: clamp(34px, 8.5vw, 54px);
-    height: clamp(38px, 9vw, 56px);
-    background: #4ecca3;
-    color: #1a1a2e;
-    font-size: clamp(18px, 5vw, 30px);
-    font-weight: 700;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: grab;
-    touch-action: none;
-    transition: transform 0.15s, box-shadow 0.15s, opacity 0.3s;
-    box-shadow: 0 3px 12px rgba(78, 204, 163, 0.3);
+    width: clamp(30px, 7.5vw, 46px);
+    height: clamp(34px, 8vw, 48px);
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: #fff; font-size: clamp(16px, 4vw, 26px);
+    font-weight: 700; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: grab; touch-action: none;
+    transition: transform 0.15s, opacity 0.3s;
+    box-shadow: 0 3px 8px rgba(231,76,60,0.3), inset 0 2px 0 rgba(255,255,255,0.2);
+    border-bottom: 3px solid #a93226;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
   }
   .letter:active { cursor: grabbing; }
   .letter:hover { transform: translateY(-2px); }
-  .letter.dragging {
-    opacity: 0.35;
-    transform: scale(0.9);
-  }
-  .letter.placed {
-    opacity: 0;
-    pointer-events: none;
-    transform: scale(0.4);
+  .letter.dragging { opacity: 0.35; transform: scale(0.9); }
+  .letter.placed { opacity: 0; pointer-events: none; transform: scale(0.4); }
+
+  /* Ground decorations */
+  .ground {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 30%; pointer-events: none; z-index: 0;
+    background: linear-gradient(180deg, transparent, rgba(126,200,80,0.3));
   }
 
-  /* Feedback */
   .feedback {
-    text-align: center;
-    padding: 4px 16px;
-    min-height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+    text-align: center; padding: 2px 12px;
+    min-height: 26px; flex-shrink: 0; position: relative; z-index: 1;
   }
   .feedback .msg {
-    font-size: clamp(13px, 2.5vw, 18px);
-    font-weight: 600;
-    transition: opacity 0.2s;
+    font-size: clamp(12px, 2.5vw, 16px); font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
   }
-  .feedback .msg.ok { color: #4ecca3; }
-  .feedback .msg.fail { color: #e94560; }
+  .feedback .msg.ok { color: #fff; }
+  .feedback .msg.fail { color: #e74c3c; }
 
-  /* Win overlay */
   .win-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(15, 52, 96, 0.93);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    position: absolute; inset: 0;
+    background: rgba(15,52,96,0.93);
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
     z-index: 100;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.5s;
-    padding: 30px;
-    text-align: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.5s; padding: 30px; text-align: center;
   }
   .win-overlay.active { opacity: 1; pointer-events: all; }
-  .win-overlay .star {
-    font-size: clamp(40px, 12vw, 70px);
-    animation: popIn 0.5s ease;
-  }
-  .win-overlay h2 {
-    font-size: clamp(28px, 8vw, 48px);
-    color: #4ecca3;
-    margin: 4px 0;
-  }
-  .win-overlay .phrase-read {
-    font-size: clamp(22px, 6vw, 40px);
-    color: #fff;
-    font-weight: 700;
-    letter-spacing: 2px;
-    margin: 4px 0 12px;
-  }
+  .win-overlay .star { font-size: clamp(40px,12vw,70px); animation: popIn 0.5s ease; }
+  .win-overlay h2 { font-size: clamp(28px,8vw,48px); color: #4ecca3; margin: 4px 0; }
+  .win-overlay .phrase-read { font-size: clamp(22px,6vw,40px); color: #fff; font-weight: 700; letter-spacing: 2px; margin: 4px 0 12px; }
   .win-overlay button {
-    padding: 12px 36px;
-    font-size: clamp(14px, 3vw, 18px);
-    font-weight: 700;
-    background: #4ecca3;
-    color: #1a1a2e;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    letter-spacing: 1px;
-    transition: transform 0.2s;
-    margin-top: 8px;
+    padding: 12px 36px; font-size: clamp(14px,3vw,18px); font-weight: 700;
+    background: #4ecca3; color: #1a1a2e; border: none; border-radius: 12px;
+    cursor: pointer; letter-spacing: 1px; transition: transform 0.2s; margin-top: 8px;
   }
   .win-overlay button:hover { transform: scale(1.05); }
 
-  .confetti-container {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    overflow: hidden;
-    z-index: 99;
-  }
-  .confetti {
-    position: absolute;
-    width: 8px; height: 8px;
-    top: -10px;
-    animation: fall linear forwards;
-  }
-  @keyframes fall {
-    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
-  }
-
-  /* Floating drag ghost */
   .drag-ghost {
-    position: fixed;
-    pointer-events: none;
-    z-index: 200;
-    width: clamp(34px, 8.5vw, 54px);
-    height: clamp(38px, 9vw, 56px);
-    background: #4ecca3;
-    color: #1a1a2e;
-    font-size: clamp(18px, 5vw, 30px);
-    font-weight: 700;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 8px 25px rgba(78,204,163,0.5);
-    transform: translate(-50%, -50%) scale(1.15);
-    opacity: 0.9;
+    position: fixed; pointer-events: none; z-index: 200;
+    width: clamp(30px,7.5vw,46px); height: clamp(34px,8vw,48px);
+    background: linear-gradient(135deg,#e74c3c,#c0392b); color: #fff;
+    font-size: clamp(16px,4vw,26px); font-weight: 700; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    transform: translate(-50%,-50%) scale(1.15);
+    border-bottom: 3px solid #a93226;
   }
 
-  @media (max-width: 400px) {
-    .slot { width: clamp(26px, 10vw, 36px); height: clamp(30px, 11vw, 40px); font-size: 16px; }
-    .letter { width: clamp(28px, 10vw, 38px); height: clamp(30px, 11vw, 40px); font-size: 16px; }
-    .letter-pool { gap: 4px; padding: 6px 8px; }
-    .slots-row { gap: 4px; }
-    .word-group { gap: 4px; }
+  /* Timer bar */
+  .timer-bar {
+    position: absolute; bottom: 0; left: 0; height: 4px;
+    background: linear-gradient(90deg, #f1c40f, #e67e22);
+    border-radius: 0 2px 2px 0;
+    transition: width 0.3s;
+    z-index: 3;
   }
 </style>
 </head>
 <body>
 
 <div class="game" id="game">
+  <!-- Sky clouds -->
+  <div class="sky-clouds" id="skyClouds"></div>
+
   <div class="header">
-    <h1>🔤 Arrasta as Letras</h1>
-    <div class="hint" id="phraseHint">Arrasta cada letra para o sítio certo</div>
+    <h1>🐦 ⚔️ 🐷</h1>
+    <div class="hint" id="phraseHint">Arrasta cada letra!</div>
   </div>
 
   <div class="stats">
-    <div class="stat"><div class="val" id="scoreDisplay">0</div><div class="label">Acertadas</div></div>
+    <div class="stat"><div class="val" id="scoreDisplay">0</div><div class="label">⭐</div></div>
     <div class="stat"><div class="val" id="totalDisplay">0</div><div class="label">Frases</div></div>
-    <div class="stat"><div class="val" id="streakDisplay" style="color:#e94560">0</div><div class="label">Seq.</div></div>
+  </div>
+
+  <!-- Bird track -->
+  <div class="track-area" id="trackArea">
+    <div class="track-line"></div>
+    <div class="track-start">🏁</div>
+    <div class="track-end">🏠</div>
+    <div class="bird" id="bird">🐦</div>
+    <div class="pig-on-track" id="pigOnTrack">🐷</div>
+    <div class="timer-bar" id="timerBar"></div>
   </div>
 
   <div class="slots-area">
-    <div class="phrase-label" id="phraseLabel">⋯</div>
     <div class="slots-row" id="slotsContainer"></div>
   </div>
 
@@ -336,47 +328,37 @@
     <div class="star">⭐</div>
     <h2>Muito bem!</h2>
     <div class="phrase-read" id="winPhrase"></div>
-    <button onclick="nextPhrase()">Próxima Frase →</button>
+    <button onclick="nextPhrase()">Próxima →</button>
   </div>
-
-  <div class="confetti-container" id="confettiContainer"></div>
 </div>
 
 <div class="drag-ghost" id="dragGhost" style="display:none"></div>
 
 <script>
-// ===== PHRASES =====
 const PHRASES = [
   { text: 'Neo Almeida', hint: 'O nome do menino mais esperto' },
-  { text: 'Ola mundo', hint: 'A primeira frase de todos' },
+  { text: 'Ola mundo', hint: 'A primeira frase' },
   { text: 'Bom dia', hint: 'Uma saudação' },
   { text: 'Eu gosto de jogar', hint: 'O que tu mais gostas?' },
   { text: 'A minha mae', hint: 'A pessoa que te ama' },
   { text: 'O meu pai', hint: 'O melhor amigo' },
   { text: 'Vamos brincar', hint: 'Um convite' },
-  { text: 'A escola', hint: 'O sítio onde aprendes' },
-  { text: 'A Andreia', hint: 'O nome da mamã' },
-  { text: 'O Mario', hint: 'O nome do papá' },
+  { text: 'A escola', hint: 'Onde aprendes' },
+  { text: 'A Andreia', hint: 'A mamã' },
+  { text: 'O Mario', hint: 'O papá' },
 ];
 
-let currentPhraseIdx = 0;
-let score = 0;
-let total = 0;
-let streak = 0;
-let placedCount = 0;
-let totalLetters = 0;
-let isWin = false;
-let dragData = null;
-let touchGhost = null;
+let currentPhraseIdx = 0, score = 0, total = 0;
+let placedCount = 0, totalLetters = 0, isWin = false;
+let dragData = null, hintTimer = null;
+const HINT_DELAY = 6000; // 6s idle → hint
 
 // Speech
 function speak(text, cb) {
   if (!window.speechSynthesis) { if(cb) cb(); return; }
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'pt-PT';
-  u.rate = 0.85;
-  u.pitch = 1.1;
+  u.lang = 'pt-PT'; u.rate = 0.85; u.pitch = 1.1;
   u.onend = () => { if(cb) cb(); };
   u.onerror = () => { if(cb) cb(); };
   window.speechSynthesis.speak(u);
@@ -389,10 +371,24 @@ function speakLetter(l) {
     'p':'pê','q':'quê','r':'érre','s':'ésse','t':'tê','u':'u','v':'vê',
     'w':'dáblio','x':'xis','y':'ípsilon','z':'zê'
   };
-  const lower = l.toLowerCase();
-  const sound = names[lower] || l;
-  speak(sound);
+  speak(names[l.toLowerCase()] || l);
 }
+
+// Clouds
+function spawnClouds() {
+  const c = document.getElementById('skyClouds');
+  for (let i = 0; i < 4; i++) {
+    const el = document.createElement('div');
+    el.className = 'cloud';
+    el.style.width = (Math.random() * 100 + 60) + 'px';
+    el.style.height = (Math.random() * 20 + 15) + 'px';
+    el.style.top = (Math.random() * 30) + '%';
+    el.style.animationDuration = (Math.random() * 15 + 15) + 's';
+    el.style.animationDelay = (Math.random() * 10) + 's';
+    c.appendChild(el);
+  }
+}
+spawnClouds();
 
 function shuffle(arr) {
   const a = [...arr];
@@ -403,12 +399,59 @@ function shuffle(arr) {
   return a;
 }
 
+// Bird progress
+function updateBird() {
+  const pct = totalLetters > 0 ? placedCount / totalLetters : 0;
+  const track = document.getElementById('trackArea');
+  const bird = document.getElementById('bird');
+  const tw = track.clientWidth - 60;
+  bird.style.left = (20 + pct * tw) + 'px';
+  
+  // Hop on progress
+  if (pct > 0) {
+    bird.classList.remove('hop');
+    void bird.offsetWidth;
+    bird.classList.add('hop');
+  }
+  
+  // Pig reaction
+  const pig = document.getElementById('pigOnTrack');
+  if (pct > 0.5) {
+    pig.classList.add('scared');
+  } else {
+    pig.classList.remove('scared');
+  }
+
+  // Timer bar
+  const bar = document.getElementById('timerBar');
+  bar.style.width = pct * 100 + '%';
+}
+
+// Idle hint
+function resetHintTimer() {
+  clearTimeout(hintTimer);
+  if (isWin) return;
+  hintTimer = setTimeout(playHint, HINT_DELAY);
+}
+
+function playHint() {
+  if (isWin || placedCount >= totalLetters) return;
+  // Find next empty slot
+  const slots = document.querySelectorAll('.slot:not(.space)');
+  for (const slot of slots) {
+    if (!slot.classList.contains('filled')) {
+      speakLetter(slot.dataset.letter);
+      break;
+    }
+  }
+  // Reset timer for next hint
+  hintTimer = setTimeout(playHint, HINT_DELAY);
+}
+
 function loadPhrase(idx) {
   const phrase = PHRASES[idx % PHRASES.length];
   const words = phrase.text.split(' ');
   
-  // Build letter array with word boundaries
-  // [{letter: 'N', wordIdx: 0, posInWord: 0}, {letter: 'e', wordIdx: 0, posInWord: 1}, ...]
   const letterData = [];
   words.forEach((word, wi) => {
     for (let li = 0; li < word.length; li++) {
@@ -419,93 +462,81 @@ function loadPhrase(idx) {
   totalLetters = letterData.length;
   placedCount = 0;
   isWin = false;
+  clearTimeout(hintTimer);
 
   document.getElementById('winOverlay').classList.remove('active');
-  document.getElementById('confettiContainer').innerHTML = '';
   document.getElementById('feedbackMsg').textContent = '';
   document.getElementById('phraseHint').textContent = phrase.hint || 'Arrasta cada letra';
-  document.getElementById('phraseLabel').textContent = phrase.text.replace(/./g, '_ ');
+  document.getElementById('bird').style.left = '20px';
+  document.getElementById('pigOnTrack').classList.remove('scared');
+  document.getElementById('timerBar').style.width = '0%';
 
-  // Build slots (grouped by word)
+  // Build slots
   const slotsEl = document.getElementById('slotsContainer');
   slotsEl.innerHTML = '';
-
-  // Create word groups
   let letterIdx = 0;
   words.forEach((word, wi) => {
     if (wi > 0) {
-      // Spacer between words
       const spacer = document.createElement('div');
       spacer.className = 'slot space';
-      spacer.dataset.index = -1;
       slotsEl.appendChild(spacer);
     }
     const group = document.createElement('div');
     group.className = 'word-group';
-    
     for (let li = 0; li < word.length; li++) {
       const div = document.createElement('div');
       div.className = 'slot';
       div.dataset.index = letterIdx;
       div.dataset.letter = word[li];
-      div.dataset.wordIdx = wi;
-      div.dataset.posInWord = li;
       div.textContent = '';
-      
       div.addEventListener('dragover', e => { e.preventDefault(); div.classList.add('drag-over'); });
       div.addEventListener('dragleave', () => div.classList.remove('drag-over'));
       div.addEventListener('drop', e => { e.preventDefault(); div.classList.remove('drag-over'); handleDrop(e, letterIdx); });
-      
       group.appendChild(div);
       letterIdx++;
     }
     slotsEl.appendChild(group);
   });
 
-  // Build letter pool (shuffled)
+  // Build letter pool
   const pool = document.getElementById('letterPool');
   pool.innerHTML = '';
   const shuffled = shuffle(letterData.map(ld => ({ letter: ld.letter, index: ld.index })));
   
-  shuffled.forEach((item, i) => {
+  shuffled.forEach((item) => {
     const div = document.createElement('div');
     div.className = 'letter';
     div.draggable = true;
     div.textContent = item.letter;
     div.dataset.letter = item.letter;
     div.dataset.origIdx = item.index;
-    div.dataset.poolIdx = i;
-    
-    // Mouse drag
+
     div.addEventListener('dragstart', e => {
       e.dataTransfer.setData('text/plain', JSON.stringify({letter: item.letter, idx: item.index}));
       div.classList.add('dragging');
     });
     div.addEventListener('dragend', () => div.classList.remove('dragging'));
-    
-    // Touch drag
+
     let tx, ty;
     div.addEventListener('touchstart', e => {
       const t = e.touches[0];
       tx = t.clientX; ty = t.clientY;
       div.classList.add('dragging');
       dragData = { letter: item.letter, idx: item.index, el: div };
-      // Show ghost
       const ghost = document.getElementById('dragGhost');
       ghost.textContent = item.letter;
       ghost.style.display = 'flex';
       ghost.style.left = t.clientX + 'px';
       ghost.style.top = t.clientY + 'px';
     }, { passive: true });
-    
+
     div.addEventListener('touchmove', e => {
       e.preventDefault();
       const t = e.touches[0];
-      const ghost = document.getElementById('dragGhost');
-      ghost.style.left = t.clientX + 'px';
-      ghost.style.top = t.clientY + 'px';
+      document.getElementById('dragGhost').style.left = t.clientX + 'px';
+      document.getElementById('dragGhost').style.top = t.clientY + 'px';
     }, { passive: false });
-    
+
     div.addEventListener('touchend', e => {
       div.classList.remove('dragging');
       document.getElementById('dragGhost').style.display = 'none';
@@ -513,8 +544,6 @@ function loadPhrase(idx) {
       const dx = t.clientX - tx;
       const dy = t.clientY - ty;
       if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
-      
-      // Find slot under finger
       const slots = document.querySelectorAll('.slot:not(.space)');
       let targetIdx = -1;
       slots.forEach(slot => {
@@ -528,10 +557,8 @@ function loadPhrase(idx) {
       }
       dragData = null;
     }, { passive: true });
-    
-    // Click fallback
+
     div.addEventListener('click', () => {
-      // Find first empty slot
       const slots = document.querySelectorAll('.slot:not(.space)');
       for (const slot of slots) {
         const idx = parseInt(slot.dataset.index);
@@ -541,95 +568,75 @@ function loadPhrase(idx) {
         }
       }
     });
-    
+
     pool.appendChild(div);
   });
 
   updateStats();
+  resetHintTimer();
 }
 
 function handleDrop(e, slotIdx) {
-  try {
-    const data = JSON.parse(e.dataTransfer.getData('text/plain'));
-    handleLetterDrop(data.letter, data.idx, slotIdx);
-  } catch(_) {}
+  try { const d = JSON.parse(e.dataTransfer.getData('text/plain')); handleLetterDrop(d.letter, d.idx, slotIdx); } catch(_) {}
 }
 
 function handleLetterDrop(letter, origIdx, slotIdx) {
   if (isWin) return;
-  
-  // Get slot element
   const slots = document.querySelectorAll('.slot:not(.space)');
   const slotEl = Array.from(slots).find(s => parseInt(s.dataset.index) === slotIdx);
   if (!slotEl || slotEl.classList.contains('filled')) return;
-  
-  const expectedLetter = slotEl.dataset.letter;
-  
-  if (letter === expectedLetter) {
-    // Correct!
+
+  if (letter === slotEl.dataset.letter) {
     slotEl.classList.add('filled');
     slotEl.textContent = letter;
     placedCount++;
-    
-    // Hide the letter from pool
     const poolLetters = document.querySelectorAll('.letter');
     poolLetters.forEach(el => {
-      if (el.textContent === letter && !el.classList.contains('placed')) {
-        // Find the original unused letter with matching origIdx
-        if (parseInt(el.dataset.origIdx) === origIdx) {
-          el.classList.add('placed');
-        }
+      if (el.textContent === letter && !el.classList.contains('placed') && parseInt(el.dataset.origIdx) === origIdx) {
+        el.classList.add('placed');
       }
     });
-    
-    // Play letter sound
     speakLetter(letter);
-    
     score++;
-    streak++;
     showFeedback('✅', 'ok');
     updateStats();
-    
+    updateBird();
+    resetHintTimer();
+
     if (placedCount === totalLetters) {
-      setTimeout(() => onWin(), 500);
+      clearTimeout(hintTimer);
+      setTimeout(() => onWin(), 400);
     }
   } else {
-    // Wrong
     slotEl.classList.add('wrong');
     setTimeout(() => slotEl.classList.remove('wrong'), 400);
-    streak = 0;
     showFeedback('❌', 'fail');
-    updateStats();
+    resetHintTimer();
   }
 }
 
 function onWin() {
   isWin = true;
   const phrase = PHRASES[currentPhraseIdx % PHRASES.length];
-  document.getElementById('winPhrase').textContent = phrase.text;
-  document.getElementById('winOverlay').classList.add('active');
-  spawnConfetti();
-  setTimeout(() => speak(phrase.text), 400);
-}
+  
+  // Hide pig on track, show flying pig
+  document.getElementById('pigOnTrack').style.display = 'none';
+  const pigFly = document.createElement('div');
+  pigFly.className = 'pig-fly';
+  pigFly.textContent = '🐷';
+  document.body.appendChild(pigFly);
 
-function spawnConfetti() {
-  const c = document.getElementById('confettiContainer');
-  const colors = ['#4ecca3','#e94560','#ffd700','#ff6b9d','#00d2ff','#a29bfe'];
-  for (let i = 0; i < 50; i++) {
-    const e = document.createElement('div');
-    e.className = 'confetti';
-    e.style.left = Math.random() * 100 + '%';
-    e.style.background = colors[Math.floor(Math.random() * colors.length)];
-    e.style.width = (Math.random() * 6 + 3) + 'px';
-    e.style.height = (Math.random() * 6 + 3) + 'px';
-    e.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-    e.style.animationDuration = (Math.random() * 2 + 2) + 's';
-    e.style.animationDelay = (Math.random() * 1.5) + 's';
-    c.appendChild(e);
-  }
+  // After pig animation ends, show win
+  setTimeout(() => {
+    pigFly.remove();
+    document.getElementById('winPhrase').textContent = phrase.text;
+    document.getElementById('winOverlay').classList.add('active');
+    speak(phrase.text);
+  }, 2500);
 }
 
 function nextPhrase() {
+  document.getElementById('pigOnTrack').style.display = 'block';
   currentPhraseIdx++;
   loadPhrase(currentPhraseIdx);
 }
@@ -639,13 +646,12 @@ function showFeedback(msg, type) {
   el.textContent = msg;
   el.className = 'msg ' + type;
   clearTimeout(el._t);
-  el._t = setTimeout(() => { if (el.textContent === msg) el.textContent = ''; }, 1200);
+  el._t = setTimeout(() => { if (el.textContent === msg) el.textContent = ''; }, 1000);
 }
 
 function updateStats() {
   document.getElementById('scoreDisplay').textContent = score;
   document.getElementById('totalDisplay').textContent = PHRASES.length;
-  document.getElementById('streakDisplay').textContent = streak;
 }
 
 loadPhrase(0);
