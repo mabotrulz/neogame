@@ -358,14 +358,30 @@ const HINT_DELAY = 6000;
 
 // ===== SOUNDS =====
 let audioCtx = null;
+let audioInitialized = false;
 function getAudioCtx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   return audioCtx;
 }
 
+function initAudio() {
+  if (audioInitialized) return;
+  audioInitialized = true;
+  try {
+    const c = getAudioCtx();
+    if (c.state === 'suspended') c.resume();
+  } catch(e) {}
+}
+
+// Initialize audio on first user interaction
+document.addEventListener('touchstart', initAudio, { once: true });
+document.addEventListener('click', initAudio, { once: true });
+document.addEventListener('keydown', initAudio, { once: true });
+
 function playTone(freq, dur, type, vol) {
   try {
     const c = getAudioCtx();
+    if (c.state === 'suspended') c.resume();
     const o = c.createOscillator();
     const g = c.createGain();
     o.type = type || 'sine';
@@ -380,6 +396,7 @@ function playTone(freq, dur, type, vol) {
 function playNoise(dur, vol, lowpass) {
   try {
     const c = getAudioCtx();
+    if (c.state === 'suspended') c.resume();
     const bufSize = c.sampleRate * dur;
     const buf = c.createBuffer(1, bufSize, c.sampleRate);
     const d = buf.getChannelData(0);
