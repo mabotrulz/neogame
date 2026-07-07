@@ -320,9 +320,9 @@
   <div class="win-overlay" id="winOverlay">
     <div class="star">⭐</div>
     <div class="win-chars">
-      <img src="assets/red_bird.png" class="bird-win" alt="🐦">
+      <img src="assets/red_bird.png" class="bird-win" id="winBird" alt="🐦">
       <div class="vs">⚔️</div>
-      <img src="assets/green_pig.png" class="pig-defeated" alt="🐷">
+      <img src="assets/green_pig.png" class="pig-defeated" id="winPig" alt="🐷">
     </div>
     <h2>Muito bem!</h2>
     <div class="phrase-read" id="winPhrase"></div>
@@ -346,9 +346,13 @@ const PHRASES = [
   { text: 'O Mario', hint: 'O papá' },
 ];
 
+const BIRDS = ['red_bird.png','blue_bird.png','yellow_bird.png','black_bird.png'];
+const PIGS = ['green_pig.png','helmet_pig.png','king_pig.png','mustache_pig.png'];
+
 let currentPhraseIdx = 0, score = 0;
 let placedCount = 0, totalLetters = 0, isWin = false;
 let dragData = null, hintTimer = null, pigTimer = null;
+let currentBird = 'red_bird.png', currentPig = 'green_pig.png';
 const HINT_DELAY = 6000;
 
 // ===== SOUNDS =====
@@ -431,25 +435,54 @@ function sfxHey() {
   } catch(e) {}
 }
 
-function sfxExplosion() {
+function sfxExplosion(type) {
   try {
     const c = getAudioCtx();
     if (c.state === 'suspended') c.resume();
-    // Noise burst
-    playNoise(0.5, 0.7, 800);
-    // Low boom
-    playTone(60, 0.5, 'sawtooth', 0.4);
-    // High shatter
-    setTimeout(() => playNoise(0.3, 0.4, 3000), 50);
-    setTimeout(() => playTone(120, 0.3, 'square', 0.2), 80);
+    type = type || Math.floor(Math.random() * 3);
+    if (type === 0) {
+      // Classic boom
+      playNoise(0.5, 0.7, 800);
+      playTone(60, 0.5, 'sawtooth', 0.4);
+      setTimeout(() => playNoise(0.3, 0.4, 3000), 50);
+      setTimeout(() => playTone(120, 0.3, 'square', 0.2), 80);
+    } else if (type === 1) {
+      // High-pitched shatter
+      playNoise(0.3, 0.6, 2000);
+      playTone(200, 0.2, 'square', 0.25);
+      setTimeout(() => playTone(400, 0.15, 'square', 0.2), 60);
+      setTimeout(() => playTone(800, 0.1, 'square', 0.15), 120);
+      setTimeout(() => playNoise(0.2, 0.3, 500), 150);
+    } else {
+      // Deep earthquake
+      playTone(40, 0.6, 'sawtooth', 0.5);
+      playNoise(0.7, 0.5, 300);
+      setTimeout(() => playTone(30, 0.4, 'square', 0.3), 100);
+      setTimeout(() => playNoise(0.4, 0.4, 100), 200);
+    }
   } catch(e) {}
 }
 
 function sfxFall() {
-  playTone(140, 0.15, 'sine', 0.15);
-  setTimeout(() => playTone(110, 0.15, 'sine', 0.12), 80);
-  setTimeout(() => playTone(80, 0.15, 'sine', 0.1), 160);
-  setTimeout(() => playNoise(0.15, 0.35, 120), 250);
+  try {
+    const c = getAudioCtx();
+    if (c.state === 'suspended') c.resume();
+    // Long descending whoosh
+    playTone(300, 0.3, 'sawtooth', 0.25);
+    setTimeout(() => playTone(150, 0.3, 'sawtooth', 0.2), 150);
+    setTimeout(() => playTone(60, 0.4, 'sawtooth', 0.3), 300);
+    // Big thud on landing
+    setTimeout(() => {
+      playNoise(0.3, 0.5, 150);
+      playTone(40, 0.4, 'square', 0.35);
+      playTone(25, 0.5, 'sawtooth', 0.3);
+    }, 500);
+    // Rattle after landing
+    setTimeout(() => {
+      playNoise(0.15, 0.3, 400);
+      playTone(80, 0.1, 'triangle', 0.1);
+    }, 550);
+  } catch(e) {}
 }
 
 // Speech
@@ -624,19 +657,22 @@ function loadPhrase(idx) {
     slotsEl.appendChild(group);
   });
 
-  // Characters
+  // Characters - pick random bird and pig
+  currentBird = BIRDS[Math.floor(Math.random() * BIRDS.length)];
+  currentPig = PIGS[Math.floor(Math.random() * PIGS.length)];
+  
   document.querySelectorAll('.slot-character').forEach(el => el.remove());
 
   const birdDiv = document.createElement('div');
   birdDiv.className = 'slot-character bird';
   birdDiv.id = 'birdChar';
-  birdDiv.innerHTML = '<img src="assets/red_bird.png" alt="🐦">';
+  birdDiv.innerHTML = '<img src="assets/' + currentBird + '" alt="🐦">';
   document.getElementById('slotsArea').appendChild(birdDiv);
 
   const pigDiv = document.createElement('div');
   pigDiv.className = 'slot-character pig';
   pigDiv.id = 'pigChar';
-  pigDiv.innerHTML = '<img src="assets/green_pig.png" alt="🐷">';
+  pigDiv.innerHTML = '<img src="assets/' + currentPig + '" alt="🐷">';
   document.getElementById('slotsArea').appendChild(pigDiv);
 
   requestAnimationFrame(() => requestAnimationFrame(positionCharacters));
@@ -756,8 +792,16 @@ function onWin() {
   document.getElementById('birdChar').style.display = 'none';
   document.getElementById('pigChar').style.display = 'none';
   
-  // Explosion!
-  sfxExplosion();
+  // Set win screen characters
+  document.getElementById('winBird').src = 'assets/' + currentBird;
+  document.getElementById('winPig').src = 'assets/' + currentPig;
+  
+  // Random explosion type
+  const expType = Math.floor(Math.random() * 3);
+  sfxExplosion(expType);
+  
+  // Clear old explosions
+  document.querySelectorAll('.explosion-ring,.explosion-particle,.flash,.explosion').forEach(el => el.remove());
   
   // Flash
   const flash = document.createElement('div');
@@ -765,46 +809,56 @@ function onWin() {
   document.body.appendChild(flash);
   setTimeout(() => flash.remove(), 400);
   
-  // Explosion rings
+  // Explosion rings (all types)
   for (let i = 0; i < 3; i++) {
     const ring = document.createElement('div');
     ring.className = 'explosion-ring';
+    ring.style.borderColor = ['#f39c12','#e74c3c','#f1c40f'][i];
+    ring.style.animationDelay = (i * 0.1) + 's';
     document.body.appendChild(ring);
-    setTimeout(() => ring.remove(), 1000);
+    setTimeout(() => ring.remove(), 1200);
   }
   
-  // Explosion center burst
+  // Center burst - varies by type
   const boom = document.createElement('div');
   boom.className = 'explosion';
-  boom.textContent = '💥';
-  boom.style.fontSize = '100px';
+  const burstEmojis = ['💥', '✨', '💫', '🔥', '⭐', '💢'];
+  boom.textContent = burstEmojis[Math.floor(Math.random() * burstEmojis.length)];
+  if (expType === 1) boom.style.fontSize = '120px';
+  else if (expType === 2) boom.style.fontSize = '80px';
+  else boom.style.fontSize = '100px';
   document.body.appendChild(boom);
-  setTimeout(() => boom.remove(), 800);
+  setTimeout(() => boom.remove(), 900);
   
-  // Particles
-  const colors = ['#f39c12','#e74c3c','#f1c40f','#e67e22','#ff6b9d'];
-  for (let i = 0; i < 15; i++) {
+  // Particles vary by type
+  const particleCount = expType === 1 ? 25 : expType === 2 ? 20 : 15;
+  const colors = expType === 0 ? ['#f39c12','#e74c3c','#f1c40f','#e67e22','#ff6b9d'] :
+                  expType === 1 ? ['#ff6b9d','#a29bfe','#00d2ff','#fff','#f1c40f'] :
+                  ['#2d3436','#636e72','#b2bec3','#e74c3c','#d63031'];
+  const spread = expType === 2 ? 250 : 400;
+  for (let i = 0; i < particleCount; i++) {
     const p = document.createElement('div');
     p.className = 'explosion-particle';
     p.style.background = colors[Math.floor(Math.random() * colors.length)];
-    p.style.setProperty('--dx', ((Math.random() - 0.5) * 400) + 'px');
-    p.style.setProperty('--dy', ((Math.random() - 0.5) * 400) + 'px');
+    p.style.width = (4 + Math.random() * 12) + 'px';
+    p.style.height = p.style.width;
+    p.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    p.style.setProperty('--dx', ((Math.random() - 0.5) * spread) + 'px');
+    p.style.setProperty('--dy', ((Math.random() - 0.5) * spread) + 'px');
     p.style.animationDelay = (Math.random() * 0.2) + 's';
     document.body.appendChild(p);
-    setTimeout(() => p.remove(), 1200);
+    setTimeout(() => p.remove(), 1400);
   }
 
   // Pig flies after explosion
   setTimeout(() => {
     const pigFly = document.createElement('div');
     pigFly.className = 'pig-fly';
-    pigFly.innerHTML = '<img src="assets/green_pig.png" alt="🐷">';
+    pigFly.innerHTML = '<img src="assets/' + currentPig + '" alt="🐷">';
     document.body.appendChild(pigFly);
 
-    // Fall sound at the end of the slide
-    setTimeout(() => {
-      sfxFall();
-    }, 1900);
+    // Fall sound
+    setTimeout(() => sfxFall(), 1400);
 
     setTimeout(() => {
       pigFly.remove();
