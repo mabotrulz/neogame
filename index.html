@@ -243,13 +243,45 @@
     transition: opacity 0.5s; padding: 30px; text-align: center;
   }
   .win-overlay.active { opacity: 1; pointer-events: all; }
-  .win-overlay .star { font-size: clamp(50px,14vw,80px); animation: popIn 0.5s ease; }
-  .win-overlay h2 { font-size: clamp(36px,10vw,56px); color: #4ecca3; margin: 6px 0; }
-  .win-overlay .phrase-read { font-size: clamp(28px,7vw,48px); color: #fff; font-weight: 700; letter-spacing: 3px; margin: 6px 0 16px; }
+  .win-overlay .star { font-size: clamp(30px,8vw,50px); animation: popIn 0.5s ease; display: block; }
+  .win-overlay h2 { font-size: clamp(32px,9vw,52px); color: #4ecca3; margin: 2px 0; }
+  .win-overlay .phrase-read { font-size: clamp(24px,6vw,42px); color: #fff; font-weight: 700; letter-spacing: 3px; margin: 4px 0 10px; }
+  .win-overlay .win-chars {
+    display: flex; align-items: center; justify-content: center;
+    gap: 20px; margin: 8px 0;
+  }
+  .win-overlay .win-chars img {
+    width: clamp(50px, 12vw, 90px);
+    height: clamp(50px, 12vw, 90px);
+    object-fit: contain;
+  }
+  .win-overlay .win-chars .vs {
+    font-size: clamp(24px, 5vw, 40px);
+    color: #f1c40f;
+    font-weight: 900;
+    animation: popIn 0.4s ease;
+  }
+  .win-overlay .win-chars .bird-win {
+    animation: birdWin 1s ease infinite;
+  }
+  @keyframes birdWin {
+    0%,100% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-6px) rotate(-5deg); }
+    75% { transform: translateY(-6px) rotate(5deg); }
+  }
+  .win-overlay .win-chars .pig-defeated {
+    filter: grayscale(0.8) brightness(0.6);
+    transform: scaleX(-1) rotate(15deg);
+    animation: pigDefeated 1.5s ease infinite;
+  }
+  @keyframes pigDefeated {
+    0%,100% { transform: scaleX(-1) rotate(15deg) translateY(0); }
+    50% { transform: scaleX(-1) rotate(20deg) translateY(4px); }
+  }
   .win-overlay button {
-    padding: 14px 44px; font-size: clamp(16px,3.5vw,22px); font-weight: 700;
+    padding: 12px 40px; font-size: clamp(14px,3vw,20px); font-weight: 700;
     background: #4ecca3; color: #1a1a2e; border: none; border-radius: 14px;
-    cursor: pointer; letter-spacing: 1px; transition: transform 0.2s; margin-top: 10px;
+    cursor: pointer; letter-spacing: 1px; transition: transform 0.2s; margin-top: 6px;
   }
   .win-overlay button:hover { transform: scale(1.05); }
 
@@ -287,6 +319,11 @@
 
   <div class="win-overlay" id="winOverlay">
     <div class="star">⭐</div>
+    <div class="win-chars">
+      <img src="assets/red_bird.png" class="bird-win" alt="🐦">
+      <div class="vs">⚔️</div>
+      <img src="assets/green_pig.png" class="pig-defeated" alt="🐷">
+    </div>
     <h2>Muito bem!</h2>
     <div class="phrase-read" id="winPhrase"></div>
     <button onclick="nextPhrase()">Próxima →</button>
