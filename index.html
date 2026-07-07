@@ -440,17 +440,28 @@ function showIntro(imgSrc, name, duration, callback) {
   img.src = imgSrc;
   nameEl.textContent = name;
   overlay.classList.add('active');
-  if (window.speechSynthesis) {
+  if (window.speechSynthesis && window.speechSynthesis.speak) {
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(name + '!');
     u.lang = 'pt-PT'; u.rate = 0.85;
-
+    u.onend = function() {
+      setTimeout(function() {
+        overlay.classList.remove('active');
+        if (callback) setTimeout(callback, 350);
+      }, 300);
+    };
     window.speechSynthesis.speak(u);
+    // Fallback timeout if speech never fires
+    setTimeout(function() {
+      overlay.classList.remove('active');
+      if (callback) setTimeout(callback, 350);
+    }, duration);
+  } else {
+    setTimeout(function() {
+      overlay.classList.remove('active');
+      if (callback) setTimeout(callback, 350);
+    }, duration);
   }
-  setTimeout(() => {
-    overlay.classList.remove('active');
-    if (callback) setTimeout(callback, 350);
-  }, duration);
 }
 
 // ===== SOUNDS =====
@@ -794,12 +805,6 @@ function loadPhrase(idx) {
   const birdName = BIRD_NAMES[currentBird] || currentBird;
   const pigName = PIG_NAMES[currentPig] || currentPig;
     showIntro('assets/' + currentBird, birdName, 1600, () => {
-    // Speak "contra" in PT between characters
-    if (window.speechSynthesis) {
-      var u = new SpeechSynthesisUtterance('contra');
-      u.lang = 'pt-PT'; u.rate = 0.85; u.pitch = 1.0;
-      window.speechSynthesis.speak(u);
-    }
     document.getElementById('slotsArea').style.opacity = '0';
     document.getElementById('letterPool').style.opacity = '0';
     showIntro('assets/' + currentPig, pigName, 1600, () => {
@@ -807,8 +812,6 @@ function loadPhrase(idx) {
       document.getElementById('letterPool').style.opacity = '1';
       finishLoadPhrase(letterData, words, phrase, shuffled);
     });
-  });
-}
 
 function finishLoadPhrase(letterData, words, phrase, shuffled) {
   
