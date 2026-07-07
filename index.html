@@ -440,27 +440,21 @@ function showIntro(imgSrc, name, duration, callback) {
   img.src = imgSrc;
   nameEl.textContent = name;
   overlay.classList.add('active');
+  let done = false;
+  function proceed() {
+    if (done) return; done = true;
+    overlay.classList.remove('active');
+    if (callback) setTimeout(callback, 350);
+  }
   if (window.speechSynthesis && window.speechSynthesis.speak) {
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(name + '!');
     u.lang = 'pt-PT'; u.rate = 0.85;
-    u.onend = function() {
-      setTimeout(function() {
-        overlay.classList.remove('active');
-        if (callback) setTimeout(callback, 350);
-      }, 300);
-    };
+    u.onend = function() { setTimeout(proceed, 300); };
     window.speechSynthesis.speak(u);
-    // Fallback timeout if speech never fires
-    setTimeout(function() {
-      overlay.classList.remove('active');
-      if (callback) setTimeout(callback, 350);
-    }, duration);
+    setTimeout(proceed, duration);
   } else {
-    setTimeout(function() {
-      overlay.classList.remove('active');
-      if (callback) setTimeout(callback, 350);
-    }, duration);
+    setTimeout(proceed, duration);
   }
 }
 
@@ -812,7 +806,7 @@ function loadPhrase(idx) {
       document.getElementById('letterPool').style.opacity = '1';
       finishLoadPhrase(letterData, words, phrase, shuffled);
     });
-
+  });
 function finishLoadPhrase(letterData, words, phrase, shuffled) {
   
   document.querySelectorAll('.slot-character').forEach(el => el.remove());
