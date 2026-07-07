@@ -43,7 +43,6 @@
   .stats .stat .val { font-size: clamp(16px, 3.5vw, 22px); font-weight: 700; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
   .stats .stat .label { font-size: clamp(7px, 1.5vw, 10px); color: #ddd; text-transform: uppercase; letter-spacing: 1px; }
 
-  /* Slots area — bird and pig sit here */
   .slots-area {
     flex: 1;
     display: flex; flex-direction: column;
@@ -61,12 +60,6 @@
   }
   .word-group { display: flex; gap: 6px; align-items: flex-end; }
   .word-group + .word-group::before { content: ''; display: inline-block; width: 12px; }
-
-  .slot-wrapper {
-    position: relative;
-    display: flex; flex-direction: column;
-    align-items: center;
-  }
 
   .slot {
     width: clamp(30px, 7vw, 48px);
@@ -99,24 +92,23 @@
   @keyframes popIn { 0%{transform:scale(0.7)}100%{transform:scale(1)} }
   @keyframes shake { 0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)} }
 
-  /* Bird on slot */
+  /* Characters on slots */
   .slot-character {
     position: absolute;
-    bottom: calc(100% + 4px);
-    left: 50%;
-    transform: translateX(-50%);
-    width: clamp(32px, 7vw, 48px);
-    height: clamp(32px, 7vw, 48px);
     z-index: 5;
-    transition: left 0.4s cubic-bezier(0.34, 1.4, 0.64, 1), bottom 0.4s ease;
     pointer-events: none;
+    transition: left 0.4s cubic-bezier(0.34, 1.4, 0.64, 1), top 0.4s ease;
   }
   .slot-character img {
     width: 100%; height: 100%;
     object-fit: contain;
     image-rendering: auto;
   }
-  .slot-character.hop {
+  .slot-character.bird {
+    width: clamp(32px, 7vw, 48px);
+    height: clamp(32px, 7vw, 48px);
+  }
+  .slot-character.bird.hop {
     animation: charHop 0.35s ease;
   }
   @keyframes charHop {
@@ -124,10 +116,17 @@
     40% { transform: translateX(-50%) translateY(-10px); }
   }
 
-  /* Pig on last slot */
   .slot-character.pig {
     width: clamp(34px, 7.5vw, 50px);
     height: clamp(34px, 7.5vw, 50px);
+  }
+  .slot-character.pig.idle-jump {
+    animation: pigIdleJump 0.6s ease;
+  }
+  @keyframes pigIdleJump {
+    0%,100% { transform: translateX(-50%) translateY(0); }
+    30% { transform: translateX(-50%) translateY(-8px) scaleX(0.9); }
+    60% { transform: translateX(-50%) translateY(8px) scaleX(1.05); }
   }
   .slot-character.pig.scared {
     animation: pigShake 0.5s ease infinite;
@@ -219,17 +218,10 @@
     border-bottom: 3px solid #a93226;
   }
 
-  .timer-bar {
-    position: absolute; bottom: 0; left: 0; height: 4px;
-    background: linear-gradient(90deg, #f1c40f, #e67e22);
-    border-radius: 0 2px 2px 0;
-    transition: width 0.3s; z-index: 2;
-  }
-
   @media (max-width: 400px) {
     .slot { width: clamp(24px,9vw,34px); height: clamp(28px,10vw,38px); font-size: 14px; }
     .letter { width: clamp(26px,9vw,36px); height: clamp(28px,10vw,38px); font-size: 14px; }
-    .slot-character { width: clamp(26px,8vw,36px); height: clamp(26px,8vw,36px); }
+    .slot-character.bird { width: clamp(26px,8vw,36px); height: clamp(26px,8vw,36px); }
     .slot-character.pig { width: clamp(28px,8.5vw,38px); height: clamp(28px,8.5vw,38px); }
   }
 </style>
@@ -279,9 +271,16 @@ const PHRASES = [
   { text: 'O Mario', hint: 'O papá' },
 ];
 
+const PROVOKES = [
+  'nha nha nha nha',
+  'nha nha nha',
+  'buuuuu',
+  'nhé nhé nhé',
+];
+
 let currentPhraseIdx = 0, score = 0;
 let placedCount = 0, totalLetters = 0, isWin = false;
-let dragData = null, hintTimer = null;
+let dragData = null, hintTimer = null, pigTimer = null;
 const HINT_DELAY = 6000;
 
 // Speech
@@ -302,7 +301,68 @@ function speakLetter(l) {
     'p':'pê','q':'quê','r':'érre','s':'ésse','t':'tê','u':'u','v':'vê',
     'w':'dáblio','x':'xis','y':'ípsilon','z':'zê'
   };
-  speak(names[l.toLowerCase()] || l);
+  return names[l.toLowerCase()] || l;
+}
+
+function speakLetterName(l) {
+  speak(speakLetter(l));
+}
+
+// Fart sound
+function playFart() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const dur = 0.3 + Math.random() * 0.2;
+    
+    // Noise burst
+    const bufSize = ctx.sampleRate * dur;
+    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) {
+      d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.3));
+    }
+    
+    const noise = ctx.createBufferSource();
+    noise.buffer = buf;
+    
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 300 + Math.random() * 200;
+    
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.6, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + dur);
+    
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    noise.start();
+    noise.stop(ctx.currentTime + dur);
+  } catch(e) {}
+}
+
+// Pig idle
+function pigIdle() {
+  if (isWin || placedCount >= totalLetters) return;
+  const pig = document.getElementById('pigChar');
+  if (!pig || pig.style.display === 'none') return;
+  
+  pig.classList.remove('idle-jump');
+  void pig.offsetWidth;
+  pig.classList.add('idle-jump');
+  
+  // Random sound
+  const roll = Math.random();
+  if (roll < 0.3) {
+    playFart();
+  } else if (roll < 0.7) {
+    const p = PROVOKES[Math.floor(Math.random() * PROVOKES.length)];
+    speak(p);
+  } // else: silent jump
+  
+  // Schedule next
+  clearTimeout(pigTimer);
+  pigTimer = setTimeout(pigIdle, 2000 + Math.random() * 3000);
 }
 
 function shuffle(arr) {
@@ -314,48 +374,39 @@ function shuffle(arr) {
   return a;
 }
 
-// Position bird and pig on slots
 function positionCharacters() {
-  const wrappers = document.querySelectorAll('.slot-wrapper:not(.space-wrapper)');
+  const wrappers = document.querySelectorAll('.slot-wrapper');
   const bird = document.getElementById('birdChar');
   const pig = document.getElementById('pigChar');
   if (!wrappers.length) return;
 
-  // Pig always on last slot
   const lastWrapper = wrappers[wrappers.length - 1];
   const lastRect = lastWrapper.getBoundingClientRect();
   const areaRect = document.getElementById('slotsArea').getBoundingClientRect();
   
-  pig.style.position = 'absolute';
   pig.style.left = (lastRect.left - areaRect.left + lastRect.width/2) + 'px';
   pig.style.top = (lastRect.top - areaRect.top - 6) + 'px';
-  pig.style.transform = 'translateX(-50%)';
 
-  // Bird on next unfilled slot (or first empty one)
   let targetIdx = -1;
   wrappers.forEach((w, i) => {
     if (!w.querySelector('.slot')?.classList.contains('filled') && targetIdx < 0) {
       targetIdx = i;
     }
   });
-  if (targetIdx < 0) targetIdx = wrappers.length - 1; // all filled → last slot
+  if (targetIdx < 0) targetIdx = wrappers.length - 1;
 
   const targetWrapper = wrappers[targetIdx];
   const targetRect = targetWrapper.getBoundingClientRect();
   
-  bird.style.position = 'absolute';
   bird.style.left = (targetRect.left - areaRect.left + targetRect.width/2) + 'px';
   bird.style.top = (targetRect.top - areaRect.top - 6) + 'px';
-  bird.style.transform = 'translateX(-50%)';
   
-  // Hop
   if (placedCount > 0) {
     bird.classList.remove('hop');
     void bird.offsetWidth;
     bird.classList.add('hop');
   }
 
-  // Pig scared when >50%
   if (placedCount / totalLetters > 0.5) {
     pig.classList.add('scared');
   } else {
@@ -363,23 +414,33 @@ function positionCharacters() {
   }
 }
 
-// Idle hint
-function resetHintTimer() {
-  clearTimeout(hintTimer);
-  if (isWin) return;
-  hintTimer = setTimeout(playHint, HINT_DELAY);
-}
-
-function playHint() {
+// Announce next letter
+function announceNextLetter() {
   if (isWin || placedCount >= totalLetters) return;
-  const slots = document.querySelectorAll('.slot:not(.space)');
-  for (const slot of slots) {
+  const wrappers = document.querySelectorAll('.slot-wrapper');
+  let nextLetter = null;
+  for (const w of wrappers) {
+    const slot = w.querySelector('.slot');
     if (!slot.classList.contains('filled')) {
-      speakLetter(slot.dataset.letter);
+      nextLetter = slot.dataset.letter;
       break;
     }
   }
-  hintTimer = setTimeout(playHint, HINT_DELAY);
+  if (nextLetter) {
+    const name = speakLetter(nextLetter);
+    speak('Encontra a letra ' + name);
+  }
+}
+
+// Idle hint fallback
+function resetHintTimer() {
+  clearTimeout(hintTimer);
+  if (isWin) return;
+  hintTimer = setTimeout(() => {
+    if (isWin || placedCount >= totalLetters) return;
+    announceNextLetter();
+    hintTimer = setTimeout(() => announceNextLetter(), HINT_DELAY);
+  }, HINT_DELAY);
 }
 
 function loadPhrase(idx) {
@@ -397,12 +458,12 @@ function loadPhrase(idx) {
   placedCount = 0;
   isWin = false;
   clearTimeout(hintTimer);
+  clearTimeout(pigTimer);
 
   document.getElementById('winOverlay').classList.remove('active');
   document.getElementById('feedbackMsg').textContent = '';
   document.getElementById('phraseHint').textContent = phrase.hint || 'Arrasta cada letra';
   
-  // Remove old flying pig if any
   const oldPig = document.querySelector('.pig-fly');
   if (oldPig) oldPig.remove();
 
@@ -422,7 +483,7 @@ function loadPhrase(idx) {
     
     for (let li = 0; li < word.length; li++) {
       const wrapper = document.createElement('div');
-      wrapper.className = 'slot-wrapper' + (letterIdx === letterData.length - 1 ? '' : '');
+      wrapper.className = 'slot-wrapper';
       
       const div = document.createElement('div');
       div.className = 'slot';
@@ -440,12 +501,11 @@ function loadPhrase(idx) {
     slotsEl.appendChild(group);
   });
 
-  // Add bird and pig characters
-  // Remove existing ones first
+  // Characters
   document.querySelectorAll('.slot-character').forEach(el => el.remove());
   
   const birdDiv = document.createElement('div');
-  birdDiv.className = 'slot-character';
+  birdDiv.className = 'slot-character bird';
   birdDiv.id = 'birdChar';
   birdDiv.innerHTML = '<img src="assets/red_bird.png" alt="🐦">';
   document.getElementById('slotsArea').appendChild(birdDiv);
@@ -456,7 +516,6 @@ function loadPhrase(idx) {
   pigDiv.innerHTML = '<img src="assets/green_pig.png" alt="🐷">';
   document.getElementById('slotsArea').appendChild(pigDiv);
 
-  // Position after layout
   requestAnimationFrame(() => {
     requestAnimationFrame(positionCharacters);
   });
@@ -521,6 +580,12 @@ function loadPhrase(idx) {
 
   updateStats();
   resetHintTimer();
+  
+  // Start pig idle timer
+  setTimeout(pigIdle, 2000 + Math.random() * 2000);
+  
+  // Announce first letter
+  setTimeout(announceNextLetter, 800);
 }
 
 function handleDrop(e, slotIdx) {
@@ -541,15 +606,19 @@ function handleLetterDrop(letter, origIdx, slotIdx) {
     pool.forEach(el => {
       if (el.textContent === letter && !el.classList.contains('placed') && parseInt(el.dataset.origIdx) === origIdx) el.classList.add('placed');
     });
-    speakLetter(letter);
+    speakLetterName(letter);
     score++;
     showFeedback('✅', 'ok');
     updateStats();
     positionCharacters();
     resetHintTimer();
+    
+    // Announce next letter right away
+    setTimeout(announceNextLetter, 600);
 
     if (placedCount === totalLetters) {
       clearTimeout(hintTimer);
+      clearTimeout(pigTimer);
       setTimeout(() => onWin(), 500);
     }
   } else {
@@ -564,11 +633,9 @@ function onWin() {
   isWin = true;
   const phrase = PHRASES[currentPhraseIdx % PHRASES.length];
   
-  // Hide characters
   document.getElementById('birdChar').style.display = 'none';
   document.getElementById('pigChar').style.display = 'none';
   
-  // Flying pig
   const pigFly = document.createElement('div');
   pigFly.className = 'pig-fly';
   pigFly.innerHTML = '<img src="assets/green_pig.png" alt="🐷">';
@@ -601,7 +668,6 @@ function updateStats() {
   document.getElementById('totalDisplay').textContent = PHRASES.length;
 }
 
-// Reposition on resize
 window.addEventListener('resize', () => { if (!isWin) positionCharacters(); });
 
 loadPhrase(0);
