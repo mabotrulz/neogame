@@ -354,7 +354,19 @@ let currentPhraseIdx = 0, score = 0;
 let placedCount = 0, totalLetters = 0, isWin = false;
 let dragData = null, hintTimer = null, pigTimer = null;
 let currentBird = 'red_bird.png', currentPig = 'green_pig.png';
+let phraseOrder = [];
 const HINT_DELAY = 6000;
+
+// Shuffle phrase order
+function shufflePhrases() {
+  phraseOrder = [];
+  for (let i = 0; i < PHRASES.length; i++) phraseOrder.push(i);
+  for (let i = phraseOrder.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [phraseOrder[i], phraseOrder[j]] = [phraseOrder[j], phraseOrder[i]];
+  }
+}
+shufflePhrases();
 
 // ===== SOUNDS =====
 let audioCtx = null;
@@ -626,7 +638,7 @@ function resetHintTimer() {
 }
 
 function loadPhrase(idx) {
-  const phrase = PHRASES[idx % PHRASES.length];
+  const phrase = PHRASES[phraseOrder[idx % phraseOrder.length]];
   const words = phrase.text.split(' ');
 
   const letterData = [];
@@ -810,7 +822,7 @@ function handleLetterDrop(letter, origIdx, slotIdx) {
 
 function onWin() {
   isWin = true;
-  const phrase = PHRASES[currentPhraseIdx % PHRASES.length];
+  const phrase = PHRASES[phraseOrder[currentPhraseIdx % phraseOrder.length]];
 
   document.getElementById('birdChar').style.display = 'none';
   document.getElementById('pigChar').style.display = 'none';
