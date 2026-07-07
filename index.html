@@ -286,6 +286,42 @@
   }
   .win-overlay button:hover { transform: scale(1.05); }
 
+  /* Character intro animation */
+  .intro-overlay {
+    position: absolute; inset: 0;
+    background: rgba(10,10,20,0.92);
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    z-index: 160;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .intro-overlay.active { opacity: 1; pointer-events: all; }
+  .intro-overlay .intro-char {
+    width: clamp(140px, 35vw, 260px);
+    height: clamp(140px, 35vw, 260px);
+    object-fit: contain;
+    animation: introEntrance 0.5s ease forwards;
+  }
+  @keyframes introEntrance {
+    0% { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+    60% { transform: scale(1.1) rotate(3deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+  }
+  .intro-overlay .intro-name {
+    font-size: clamp(24px, 7vw, 48px);
+    font-weight: 800;
+    color: #4ecca3;
+    margin-top: 8px;
+    text-shadow: 0 0 30px rgba(78,204,163,0.3);
+    animation: introNameIn 0.4s ease 0.3s forwards;
+    opacity: 0;
+  }
+  @keyframes introNameIn {
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+
   .drag-ghost {
     position: fixed; pointer-events: none; z-index: 200;
     width: clamp(36px,8.5vw,54px); height: clamp(42px,10vw,58px);
@@ -331,6 +367,12 @@
   </div>
 </div>
 
+<!-- Intro overlay -->
+<div class="intro-overlay" id="introOverlay">
+  <img class="intro-char" id="introImage" src="" alt="">
+  <div class="intro-name" id="introName"></div>
+</div>
+
 <!-- Start overlay -->
 <div class="start-overlay" id="startOverlay" style="position:absolute;inset:0;background:rgba(15,52,96,0.95);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:150;padding:30px;text-align:center;transition:opacity 0.5s">
   <div style="font-size:clamp(40px,12vw,70px);margin-bottom:8px">🐦</div>
@@ -358,6 +400,19 @@ const PHRASES = [
 const BIRDS = ['red_bird.png','blue_bird.png','yellow_bird.png','black_bird.png'];
 const PIGS = ['green_pig.png','king_pig.png','foreman_pig.png','corporal_pig.png'];
 
+const BIRD_NAMES = {
+  'red_bird.png':'Pássaro Vermelho',
+  'blue_bird.png':'Os Azuis',
+  'yellow_bird.png':'Pássaro Amarelo',
+  'black_bird.png':'Pássaro Preto'
+};
+const PIG_NAMES = {
+  'green_pig.png':'Porco Verde',
+  'king_pig.png':'Rei Porco',
+  'foreman_pig.png':'Capataz Porco',
+  'corporal_pig.png':'Cabo Porco'
+};
+
 let currentPhraseIdx = 0, score = 0;
 let placedCount = 0, totalLetters = 0, isWin = false;
 let dragData = null, hintTimer = null, pigTimer = null;
@@ -375,6 +430,26 @@ function shufflePhrases() {
   }
 }
 shufflePhrases();
+
+// Intro animation
+function showIntro(imgSrc, name, duration, callback) {
+  const overlay = document.getElementById('introOverlay');
+  const img = document.getElementById('introImage');
+  const nameEl = document.getElementById('introName');
+  img.src = imgSrc;
+  nameEl.textContent = name;
+  overlay.classList.add('active');
+  if (window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(name);
+    u.lang = 'pt-PT'; u.rate = 0.85;
+    window.speechSynthesis.speak(u);
+  }
+  setTimeout(() => {
+    overlay.classList.remove('active');
+    if (callback) setTimeout(callback, 350);
+  }, duration);
+}
 
 // ===== SOUNDS =====
 let audioCtx = null;
@@ -704,6 +779,25 @@ function loadPhrase(idx) {
   currentBird = BIRDS[Math.floor(Math.random() * BIRDS.length)];
   currentPig = PIGS[Math.floor(Math.random() * PIGS.length)];
   
+  // Prepare shuffled letters
+  const shuffled = shuffle(letterData.map(ld => ({ letter: ld.letter, index: ld.index })));
+  
+  // Show intro animation with characters
+  const birdName = BIRD_NAMES[currentBird] || currentBird;
+  const pigName = PIG_NAMES[currentPig] || currentPig;
+  showIntro('assets/' + currentBird, birdName, 1600, () => {
+    document.getElementById('slotsArea').style.opacity = '0';
+    document.getElementById('letterPool').style.opacity = '0';
+    showIntro('assets/' + currentPig, pigName, 1600, () => {
+      document.getElementById('slotsArea').style.opacity = '1';
+      document.getElementById('letterPool').style.opacity = '1';
+      finishLoadPhrase(letterData, words, phrase, shuffled);
+    });
+  });
+}
+
+function finishLoadPhrase(letterData, words, phrase, shuffled) {
+  
   document.querySelectorAll('.slot-character').forEach(el => el.remove());
 
   const birdDiv = document.createElement('div');
@@ -720,10 +814,9 @@ function loadPhrase(idx) {
 
   requestAnimationFrame(() => requestAnimationFrame(positionCharacters));
 
-  // Letter pool
+  // Letter pool - use passed shuffled array
   const pool = document.getElementById('letterPool');
   pool.innerHTML = '';
-  const shuffled = shuffle(letterData.map(ld => ({ letter: ld.letter, index: ld.index })));
 
   shuffled.forEach((item) => {
     const div = document.createElement('div');
@@ -935,8 +1028,8 @@ window.addEventListener('resize', () => { if (!isWin) positionCharacters(); });
 
 function startLetterGame() {
   document.getElementById('startOverlay').style.opacity = '0';
-  setTimeout(() => { document.getElementById('startOverlay').style.display = 'none'; }, 500);
-  initAudio(); // This already calls announceNextLetter on first init
+  setTimeout(() => { document.getElementById('startOverlay').style.display = 'none'; }, 300);
+  initAudio();
 }
 
 loadPhrase(0);
