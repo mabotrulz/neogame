@@ -9,176 +9,80 @@
   body {
     background: #1a1a2e;
     font-family: 'Segoe UI', system-ui, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: flex; justify-content: center; align-items: center;
     min-height: 100vh; min-height: 100dvh;
-    overflow: hidden;
-    touch-action: none;
-    user-select: none;
+    overflow: hidden; touch-action: none; user-select: none;
   }
 
   .game {
     width: 100vw; height: 100vh; height: 100dvh;
     max-width: 800px;
     background: linear-gradient(180deg, #87CEEB 0%, #98D8E8 40%, #b8e6b8 70%, #7ec850 100%);
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    overflow: hidden;
-  }
-
-  /* Sky decorations */
-  .sky-clouds {
-    position: absolute; inset: 0;
-    pointer-events: none; overflow: hidden;
-    z-index: 0;
-  }
-  .cloud {
-    position: absolute;
-    background: rgba(255,255,255,0.6);
-    border-radius: 50px;
-    animation: cloudDrift linear infinite;
-  }
-  @keyframes cloudDrift {
-    0% { transform: translateX(-150px); }
-    100% { transform: translateX(calc(100vw + 150px)); }
+    display: flex; flex-direction: column;
+    position: relative; overflow: hidden;
   }
 
   .header {
-    text-align: center; padding: 12px 12px 4px;
-    flex-shrink: 0; position: relative; z-index: 1;
+    text-align: center; padding: 8px 12px 2px;
+    flex-shrink: 0; position: relative; z-index: 2;
   }
   .header h1 {
-    color: #c0392b; font-size: clamp(13px, 3vw, 20px);
+    color: #c0392b; font-size: clamp(12px, 2.5vw, 18px);
     font-weight: 900; letter-spacing: 1px;
-    text-shadow: 2px 2px 0 #e74c3c33;
   }
   .header .hint {
     color: #555; font-size: clamp(9px, 1.8vw, 12px);
-    margin-top: 2px; min-height: 16px;
-  }
-
-  /* Bird track */
-  .track-area {
-    flex-shrink: 0; position: relative; z-index: 1;
-    height: clamp(50px, 12vw, 80px);
-    margin: 0 16px;
-    border-bottom: 3px solid #8B4513;
-    background: linear-gradient(180deg, transparent 60%, rgba(139,69,19,0.1) 100%);
-  }
-  .track-line {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 3px;
-    background: #8B4513;
-  }
-  .track-start, .track-end {
-    position: absolute;
-    bottom: -12px;
-    font-size: clamp(18px, 4vw, 28px);
-  }
-  .track-start { left: 0; }
-  .track-end { right: 0; }
-
-  .bird {
-    position: absolute;
-    bottom: 8px;
-    font-size: clamp(28px, 6vw, 42px);
-    transition: left 0.5s cubic-bezier(0.34, 1.2, 0.64, 1);
-    z-index: 2;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-  }
-  .bird.hop { animation: birdHop 0.3s ease; }
-  @keyframes birdHop {
-    0%,100% { transform: translateY(0) scaleX(1); }
-    50% { transform: translateY(-12px) scaleX(0.85); }
-  }
-
-  .pig-on-track {
-    position: absolute;
-    bottom: 6px;
-    right: 0;
-    font-size: clamp(24px, 5vw, 36px);
-    z-index: 2;
-    transition: all 0.3s;
-  }
-  .pig-on-track.scared {
-    animation: pigShake 0.4s ease;
-  }
-  @keyframes pigShake {
-    0%,100% { transform: translateY(0); }
-    25% { transform: translateY(-4px); }
-    75% { transform: translateY(4px); }
-  }
-
-  /* Pig fly animation */
-  .pig-fly {
-    position: fixed;
-    z-index: 200;
-    pointer-events: none;
-    font-size: 60px;
-    transform: translate(-50%, -50%);
-    left: 50%; top: 50%;
-    transition: none;
-    animation: pigGrow 1.5s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
-  }
-  @keyframes pigGrow {
-    0%   { font-size: 60px; opacity: 0; transform: translate(-50%,-50%) scale(0.3) rotate(-10deg); }
-    20%  { opacity: 1; transform: translate(-50%,-50%) scale(0.8) rotate(5deg); }
-    60%  { font-size: clamp(200px, 70vw, 500px); transform: translate(-50%,-50%) scale(1) rotate(-3deg); opacity: 1; }
-    80%  { font-size: clamp(200px, 70vw, 500px); transform: translate(-50%,-50%) scale(1.1) rotate(3deg); opacity: 1; }
-    100% { font-size: clamp(200px, 70vw, 500px); transform: translate(-50%, 120vh) scale(1) rotate(15deg); opacity: 1; }
+    margin-top: 1px; min-height: 16px;
   }
 
   .stats {
-    display: flex; justify-content: center; gap: 16px;
-    padding: 2px 12px 4px; flex-shrink: 0; position: relative; z-index: 1;
+    display: flex; justify-content: center; gap: 20px;
+    padding: 0 12px 2px; flex-shrink: 0; position: relative; z-index: 2;
   }
   .stats .stat { text-align: center; }
-  .stats .stat .val {
-    font-size: clamp(18px, 4vw, 26px); font-weight: 700; color: #fff;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-  }
-  .stats .stat .label {
-    font-size: clamp(7px, 1.5vw, 10px); color: #ddd;
-    text-transform: uppercase; letter-spacing: 1px;
-  }
+  .stats .stat .val { font-size: clamp(16px, 3.5vw, 22px); font-weight: 700; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+  .stats .stat .label { font-size: clamp(7px, 1.5vw, 10px); color: #ddd; text-transform: uppercase; letter-spacing: 1px; }
 
-  /* Slots */
+  /* Slots area — bird and pig sit here */
   .slots-area {
     flex: 1;
     display: flex; flex-direction: column;
     justify-content: center; align-items: center;
-    padding: 4px 8px; gap: 4px;
-    min-height: 0; position: relative; z-index: 1;
+    padding: 12px 8px 4px;
+    position: relative; z-index: 2;
+    min-height: 0;
   }
+
   .slots-row {
     display: flex; flex-wrap: wrap;
-    justify-content: center; gap: 5px; padding: 4px;
+    justify-content: center; align-items: flex-end;
+    gap: 6px; padding: 8px 4px;
+    position: relative;
   }
-  .word-group { display: flex; gap: 5px; align-items: center; }
-  .word-group + .word-group::before {
-    content: ''; display: inline-block; width: 10px;
+  .word-group { display: flex; gap: 6px; align-items: flex-end; }
+  .word-group + .word-group::before { content: ''; display: inline-block; width: 12px; }
+
+  .slot-wrapper {
+    position: relative;
+    display: flex; flex-direction: column;
+    align-items: center;
   }
+
   .slot {
-    width: clamp(28px, 7vw, 44px);
-    height: clamp(34px, 8vw, 48px);
+    width: clamp(30px, 7vw, 48px);
+    height: clamp(36px, 8.5vw, 52px);
     border: 2.5px dashed #fff;
     border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
-    font-size: clamp(16px, 4vw, 26px); font-weight: 700;
-    color: #fff;
+    font-size: clamp(16px, 4vw, 28px);
+    font-weight: 700; color: #fff;
     transition: all 0.25s;
     background: rgba(255,255,255,0.1);
-    position: relative;
   }
   .slot.filled {
     border-style: solid;
     background: rgba(255,255,255,0.2);
     animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
-    color: #fff;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
   }
   .slot.wrong {
     border-color: #e74c3c;
@@ -190,28 +94,75 @@
     background: rgba(241,196,15,0.15);
     transform: scale(1.08);
   }
-  .slot.space {
-    border: none; background: transparent;
-    width: 6px; height: auto; pointer-events: none;
+  .slot.space { border: none; background: transparent; width: 6px; height: auto; pointer-events: none; }
+
+  @keyframes popIn { 0%{transform:scale(0.7)}100%{transform:scale(1)} }
+  @keyframes shake { 0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)} }
+
+  /* Bird on slot */
+  .slot-character {
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: clamp(32px, 7vw, 48px);
+    height: clamp(32px, 7vw, 48px);
+    z-index: 5;
+    transition: left 0.4s cubic-bezier(0.34, 1.4, 0.64, 1), bottom 0.4s ease;
+    pointer-events: none;
   }
-  @keyframes popIn {
-    0% { transform: scale(0.7); }
-    100% { transform: scale(1); }
+  .slot-character img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    image-rendering: auto;
   }
-  @keyframes shake {
-    0%,100% { transform: translateX(0); }
-    20% { transform: translateX(-5px); }
-    40% { transform: translateX(5px); }
-    60% { transform: translateX(-3px); }
-    80% { transform: translateX(3px); }
+  .slot-character.hop {
+    animation: charHop 0.35s ease;
+  }
+  @keyframes charHop {
+    0%,100% { transform: translateX(-50%) translateY(0); }
+    40% { transform: translateX(-50%) translateY(-10px); }
+  }
+
+  /* Pig on last slot */
+  .slot-character.pig {
+    width: clamp(34px, 7.5vw, 50px);
+    height: clamp(34px, 7.5vw, 50px);
+  }
+  .slot-character.pig.scared {
+    animation: pigShake 0.5s ease infinite;
+  }
+  @keyframes pigShake {
+    0%,100% { transform: translateX(-50%) translateY(0); }
+    25% { transform: translateX(-50%) translateY(-3px); }
+    75% { transform: translateX(-50%) translateY(3px); }
+  }
+
+  /* Flying pig */
+  .pig-fly {
+    position: fixed; z-index: 200; pointer-events: none;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    animation: pigGrow 2s cubic-bezier(0.2,0.8,0.3,1) forwards;
+  }
+  .pig-fly img {
+    width: 60px; height: 60px;
+    object-fit: contain;
+  }
+  @keyframes pigGrow {
+    0%   { transform: translate(-50%,-50%) scale(0.3) rotate(-10deg); opacity: 0; }
+    20%  { opacity: 1; }
+    60%  { transform: translate(-50%,-50%) scale(4) rotate(-3deg); opacity: 1; }
+    80%  { transform: translate(-50%,-50%) scale(4.5) rotate(3deg); opacity: 1; }
+    100% { transform: translate(-50%, calc(50vh + 60vw)) scale(4) rotate(15deg); opacity: 1; }
   }
 
   .letter-pool {
     display: flex; flex-wrap: wrap;
     justify-content: center; gap: 5px;
     padding: 6px 10px;
-    flex-shrink: 0; min-height: 44px; max-height: 120px;
-    overflow-y: auto; position: relative; z-index: 1;
+    flex-shrink: 0; min-height: 42px; max-height: 110px;
+    overflow-y: auto; position: relative; z-index: 2;
   }
   .letter {
     width: clamp(30px, 7.5vw, 46px);
@@ -231,21 +182,11 @@
   .letter.dragging { opacity: 0.35; transform: scale(0.9); }
   .letter.placed { opacity: 0; pointer-events: none; transform: scale(0.4); }
 
-  /* Ground decorations */
-  .ground {
-    position: absolute; bottom: 0; left: 0; right: 0;
-    height: 30%; pointer-events: none; z-index: 0;
-    background: linear-gradient(180deg, transparent, rgba(126,200,80,0.3));
-  }
-
   .feedback {
     text-align: center; padding: 2px 12px;
-    min-height: 26px; flex-shrink: 0; position: relative; z-index: 1;
+    min-height: 24px; flex-shrink: 0; position: relative; z-index: 2;
   }
-  .feedback .msg {
-    font-size: clamp(12px, 2.5vw, 16px); font-weight: 600;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-  }
+  .feedback .msg { font-size: clamp(12px,2.5vw,16px); font-weight: 600; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
   .feedback .msg.ok { color: #fff; }
   .feedback .msg.fail { color: #e74c3c; }
 
@@ -254,8 +195,7 @@
     background: rgba(15,52,96,0.93);
     display: flex; flex-direction: column;
     justify-content: center; align-items: center;
-    z-index: 100;
-    opacity: 0; pointer-events: none;
+    z-index: 100; opacity: 0; pointer-events: none;
     transition: opacity 0.5s; padding: 30px; text-align: center;
   }
   .win-overlay.active { opacity: 1; pointer-events: all; }
@@ -275,29 +215,30 @@
     background: linear-gradient(135deg,#e74c3c,#c0392b); color: #fff;
     font-size: clamp(16px,4vw,26px); font-weight: 700; border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-    transform: translate(-50%,-50%) scale(1.15);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3); transform: translate(-50%,-50%) scale(1.15);
     border-bottom: 3px solid #a93226;
   }
 
-  /* Timer bar */
   .timer-bar {
     position: absolute; bottom: 0; left: 0; height: 4px;
     background: linear-gradient(90deg, #f1c40f, #e67e22);
     border-radius: 0 2px 2px 0;
-    transition: width 0.3s;
-    z-index: 3;
+    transition: width 0.3s; z-index: 2;
+  }
+
+  @media (max-width: 400px) {
+    .slot { width: clamp(24px,9vw,34px); height: clamp(28px,10vw,38px); font-size: 14px; }
+    .letter { width: clamp(26px,9vw,36px); height: clamp(28px,10vw,38px); font-size: 14px; }
+    .slot-character { width: clamp(26px,8vw,36px); height: clamp(26px,8vw,36px); }
+    .slot-character.pig { width: clamp(28px,8.5vw,38px); height: clamp(28px,8.5vw,38px); }
   }
 </style>
 </head>
 <body>
 
 <div class="game" id="game">
-  <!-- Sky clouds -->
-  <div class="sky-clouds" id="skyClouds"></div>
-
   <div class="header">
-    <h1>🐦 ⚔️ 🐷</h1>
+    <h1>🐦 Letras ⚔️ 🐷</h1>
     <div class="hint" id="phraseHint">Arrasta cada letra!</div>
   </div>
 
@@ -306,17 +247,7 @@
     <div class="stat"><div class="val" id="totalDisplay">0</div><div class="label">Frases</div></div>
   </div>
 
-  <!-- Bird track -->
-  <div class="track-area" id="trackArea">
-    <div class="track-line"></div>
-    <div class="track-start">🏁</div>
-    <div class="track-end">🏠</div>
-    <div class="bird" id="bird">🐦</div>
-    <div class="pig-on-track" id="pigOnTrack">🐷</div>
-    <div class="timer-bar" id="timerBar"></div>
-  </div>
-
-  <div class="slots-area">
+  <div class="slots-area" id="slotsArea">
     <div class="slots-row" id="slotsContainer"></div>
   </div>
 
@@ -348,10 +279,10 @@ const PHRASES = [
   { text: 'O Mario', hint: 'O papá' },
 ];
 
-let currentPhraseIdx = 0, score = 0, total = 0;
+let currentPhraseIdx = 0, score = 0;
 let placedCount = 0, totalLetters = 0, isWin = false;
 let dragData = null, hintTimer = null;
-const HINT_DELAY = 6000; // 6s idle → hint
+const HINT_DELAY = 6000;
 
 // Speech
 function speak(text, cb) {
@@ -374,22 +305,6 @@ function speakLetter(l) {
   speak(names[l.toLowerCase()] || l);
 }
 
-// Clouds
-function spawnClouds() {
-  const c = document.getElementById('skyClouds');
-  for (let i = 0; i < 4; i++) {
-    const el = document.createElement('div');
-    el.className = 'cloud';
-    el.style.width = (Math.random() * 100 + 60) + 'px';
-    el.style.height = (Math.random() * 20 + 15) + 'px';
-    el.style.top = (Math.random() * 30) + '%';
-    el.style.animationDuration = (Math.random() * 15 + 15) + 's';
-    el.style.animationDelay = (Math.random() * 10) + 's';
-    c.appendChild(el);
-  }
-}
-spawnClouds();
-
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -399,32 +314,53 @@ function shuffle(arr) {
   return a;
 }
 
-// Bird progress
-function updateBird() {
-  const pct = totalLetters > 0 ? placedCount / totalLetters : 0;
-  const track = document.getElementById('trackArea');
-  const bird = document.getElementById('bird');
-  const tw = track.clientWidth - 60;
-  bird.style.left = (20 + pct * tw) + 'px';
+// Position bird and pig on slots
+function positionCharacters() {
+  const wrappers = document.querySelectorAll('.slot-wrapper:not(.space-wrapper)');
+  const bird = document.getElementById('birdChar');
+  const pig = document.getElementById('pigChar');
+  if (!wrappers.length) return;
+
+  // Pig always on last slot
+  const lastWrapper = wrappers[wrappers.length - 1];
+  const lastRect = lastWrapper.getBoundingClientRect();
+  const areaRect = document.getElementById('slotsArea').getBoundingClientRect();
   
-  // Hop on progress
-  if (pct > 0) {
+  pig.style.position = 'absolute';
+  pig.style.left = (lastRect.left - areaRect.left + lastRect.width/2) + 'px';
+  pig.style.top = (lastRect.top - areaRect.top - 6) + 'px';
+  pig.style.transform = 'translateX(-50%)';
+
+  // Bird on next unfilled slot (or first empty one)
+  let targetIdx = -1;
+  wrappers.forEach((w, i) => {
+    if (!w.querySelector('.slot')?.classList.contains('filled') && targetIdx < 0) {
+      targetIdx = i;
+    }
+  });
+  if (targetIdx < 0) targetIdx = wrappers.length - 1; // all filled → last slot
+
+  const targetWrapper = wrappers[targetIdx];
+  const targetRect = targetWrapper.getBoundingClientRect();
+  
+  bird.style.position = 'absolute';
+  bird.style.left = (targetRect.left - areaRect.left + targetRect.width/2) + 'px';
+  bird.style.top = (targetRect.top - areaRect.top - 6) + 'px';
+  bird.style.transform = 'translateX(-50%)';
+  
+  // Hop
+  if (placedCount > 0) {
     bird.classList.remove('hop');
     void bird.offsetWidth;
     bird.classList.add('hop');
   }
-  
-  // Pig reaction
-  const pig = document.getElementById('pigOnTrack');
-  if (pct > 0.5) {
+
+  // Pig scared when >50%
+  if (placedCount / totalLetters > 0.5) {
     pig.classList.add('scared');
   } else {
     pig.classList.remove('scared');
   }
-
-  // Timer bar
-  const bar = document.getElementById('timerBar');
-  bar.style.width = pct * 100 + '%';
 }
 
 // Idle hint
@@ -436,7 +372,6 @@ function resetHintTimer() {
 
 function playHint() {
   if (isWin || placedCount >= totalLetters) return;
-  // Find next empty slot
   const slots = document.querySelectorAll('.slot:not(.space)');
   for (const slot of slots) {
     if (!slot.classList.contains('filled')) {
@@ -444,7 +379,6 @@ function playHint() {
       break;
     }
   }
-  // Reset timer for next hint
   hintTimer = setTimeout(playHint, HINT_DELAY);
 }
 
@@ -467,14 +401,16 @@ function loadPhrase(idx) {
   document.getElementById('winOverlay').classList.remove('active');
   document.getElementById('feedbackMsg').textContent = '';
   document.getElementById('phraseHint').textContent = phrase.hint || 'Arrasta cada letra';
-  document.getElementById('bird').style.left = '20px';
-  document.getElementById('pigOnTrack').classList.remove('scared');
-  document.getElementById('timerBar').style.width = '0%';
+  
+  // Remove old flying pig if any
+  const oldPig = document.querySelector('.pig-fly');
+  if (oldPig) oldPig.remove();
 
-  // Build slots
+  // Build slots with wrappers
   const slotsEl = document.getElementById('slotsContainer');
   slotsEl.innerHTML = '';
   let letterIdx = 0;
+
   words.forEach((word, wi) => {
     if (wi > 0) {
       const spacer = document.createElement('div');
@@ -483,7 +419,11 @@ function loadPhrase(idx) {
     }
     const group = document.createElement('div');
     group.className = 'word-group';
+    
     for (let li = 0; li < word.length; li++) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'slot-wrapper' + (letterIdx === letterData.length - 1 ? '' : '');
+      
       const div = document.createElement('div');
       div.className = 'slot';
       div.dataset.index = letterIdx;
@@ -492,17 +432,40 @@ function loadPhrase(idx) {
       div.addEventListener('dragover', e => { e.preventDefault(); div.classList.add('drag-over'); });
       div.addEventListener('dragleave', () => div.classList.remove('drag-over'));
       div.addEventListener('drop', e => { e.preventDefault(); div.classList.remove('drag-over'); handleDrop(e, letterIdx); });
-      group.appendChild(div);
+      
+      wrapper.appendChild(div);
+      group.appendChild(wrapper);
       letterIdx++;
     }
     slotsEl.appendChild(group);
+  });
+
+  // Add bird and pig characters
+  // Remove existing ones first
+  document.querySelectorAll('.slot-character').forEach(el => el.remove());
+  
+  const birdDiv = document.createElement('div');
+  birdDiv.className = 'slot-character';
+  birdDiv.id = 'birdChar';
+  birdDiv.innerHTML = '<img src="assets/red_bird.png" alt="🐦">';
+  document.getElementById('slotsArea').appendChild(birdDiv);
+
+  const pigDiv = document.createElement('div');
+  pigDiv.className = 'slot-character pig';
+  pigDiv.id = 'pigChar';
+  pigDiv.innerHTML = '<img src="assets/green_pig.png" alt="🐷">';
+  document.getElementById('slotsArea').appendChild(pigDiv);
+
+  // Position after layout
+  requestAnimationFrame(() => {
+    requestAnimationFrame(positionCharacters);
   });
 
   // Build letter pool
   const pool = document.getElementById('letterPool');
   pool.innerHTML = '';
   const shuffled = shuffle(letterData.map(ld => ({ letter: ld.letter, index: ld.index })));
-  
+
   shuffled.forEach((item) => {
     const div = document.createElement('div');
     div.className = 'letter';
@@ -525,50 +488,34 @@ function loadPhrase(idx) {
       dragData = { letter: item.letter, idx: item.index, el: div };
       const ghost = document.getElementById('dragGhost');
       ghost.textContent = item.letter;
-      ghost.style.display = 'flex';
-      ghost.style.left = t.clientX + 'px';
-      ghost.style.top = t.clientY + 'px';
+      ghost.style.display = 'flex'; ghost.style.left = t.clientX + 'px'; ghost.style.top = t.clientY + 'px';
     }, { passive: true });
-
     div.addEventListener('touchmove', e => {
       e.preventDefault();
       const t = e.touches[0];
-      document.getElementById('dragGhost').style.left = t.clientX + 'px';
-      document.getElementById('dragGhost').style.top = t.clientY + 'px';
+      document.getElementById('dragGhost').style.left = t.clientX + 'px'; document.getElementById('dragGhost').style.top = t.clientY + 'px';
     }, { passive: false });
-
     div.addEventListener('touchend', e => {
-      div.classList.remove('dragging');
-      document.getElementById('dragGhost').style.display = 'none';
+      div.classList.remove('dragging'); document.getElementById('dragGhost').style.display = 'none';
       const t = e.changedTouches[0];
-      const dx = t.clientX - tx;
-      const dy = t.clientY - ty;
+      const dx = t.clientX - tx, dy = t.clientY - ty;
       if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
       const slots = document.querySelectorAll('.slot:not(.space)');
       let targetIdx = -1;
       slots.forEach(slot => {
         const r = slot.getBoundingClientRect();
-        if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) {
-          targetIdx = parseInt(slot.dataset.index);
-        }
+        if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) targetIdx = parseInt(slot.dataset.index);
       });
-      if (targetIdx >= 0 && dragData) {
-        handleLetterDrop(dragData.letter, dragData.idx, targetIdx);
-      }
+      if (targetIdx >= 0 && dragData) handleLetterDrop(dragData.letter, dragData.idx, targetIdx);
       dragData = null;
     }, { passive: true });
-
     div.addEventListener('click', () => {
       const slots = document.querySelectorAll('.slot:not(.space)');
       for (const slot of slots) {
         const idx = parseInt(slot.dataset.index);
-        if (idx >= 0 && !slot.classList.contains('filled')) {
-          handleLetterDrop(item.letter, item.index, idx);
-          break;
-        }
+        if (idx >= 0 && !slot.classList.contains('filled')) { handleLetterDrop(item.letter, item.index, idx); break; }
       }
     });
-
     pool.appendChild(div);
   });
 
@@ -590,22 +537,20 @@ function handleLetterDrop(letter, origIdx, slotIdx) {
     slotEl.classList.add('filled');
     slotEl.textContent = letter;
     placedCount++;
-    const poolLetters = document.querySelectorAll('.letter');
-    poolLetters.forEach(el => {
-      if (el.textContent === letter && !el.classList.contains('placed') && parseInt(el.dataset.origIdx) === origIdx) {
-        el.classList.add('placed');
-      }
+    const pool = document.querySelectorAll('.letter');
+    pool.forEach(el => {
+      if (el.textContent === letter && !el.classList.contains('placed') && parseInt(el.dataset.origIdx) === origIdx) el.classList.add('placed');
     });
     speakLetter(letter);
     score++;
     showFeedback('✅', 'ok');
     updateStats();
-    updateBird();
+    positionCharacters();
     resetHintTimer();
 
     if (placedCount === totalLetters) {
       clearTimeout(hintTimer);
-      setTimeout(() => onWin(), 400);
+      setTimeout(() => onWin(), 500);
     }
   } else {
     slotEl.classList.add('wrong');
@@ -619,14 +564,16 @@ function onWin() {
   isWin = true;
   const phrase = PHRASES[currentPhraseIdx % PHRASES.length];
   
-  // Hide pig on track, show flying pig
-  document.getElementById('pigOnTrack').style.display = 'none';
+  // Hide characters
+  document.getElementById('birdChar').style.display = 'none';
+  document.getElementById('pigChar').style.display = 'none';
+  
+  // Flying pig
   const pigFly = document.createElement('div');
   pigFly.className = 'pig-fly';
-  pigFly.textContent = '🐷';
+  pigFly.innerHTML = '<img src="assets/green_pig.png" alt="🐷">';
   document.body.appendChild(pigFly);
 
-  // After pig animation ends, show win
   setTimeout(() => {
     pigFly.remove();
     document.getElementById('winPhrase').textContent = phrase.text;
@@ -636,15 +583,15 @@ function onWin() {
 }
 
 function nextPhrase() {
-  document.getElementById('pigOnTrack').style.display = 'block';
+  document.getElementById('birdChar').style.display = 'block';
+  document.getElementById('pigChar').style.display = 'block';
   currentPhraseIdx++;
   loadPhrase(currentPhraseIdx);
 }
 
 function showFeedback(msg, type) {
   const el = document.getElementById('feedbackMsg');
-  el.textContent = msg;
-  el.className = 'msg ' + type;
+  el.textContent = msg; el.className = 'msg ' + type;
   clearTimeout(el._t);
   el._t = setTimeout(() => { if (el.textContent === msg) el.textContent = ''; }, 1000);
 }
@@ -653,6 +600,9 @@ function updateStats() {
   document.getElementById('scoreDisplay').textContent = score;
   document.getElementById('totalDisplay').textContent = PHRASES.length;
 }
+
+// Reposition on resize
+window.addEventListener('resize', () => { if (!isWin) positionCharacters(); });
 
 loadPhrase(0);
 </script>
