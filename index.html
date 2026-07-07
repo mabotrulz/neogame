@@ -797,11 +797,25 @@ function loadPhrase(idx) {
     showIntro('assets/' + currentBird, birdName, 2200, function() {
       document.getElementById('slotsArea').style.opacity = '0';
       document.getElementById('letterPool').style.opacity = '0';
-      showIntro('assets/' + currentPig, 'contra ' + pigName, 1200, function() {
+      if (window.speechSynthesis) {
+        var u = new SpeechSynthesisUtterance('contra ' + pigName + '!');
+        u.lang = 'pt-PT'; u.rate = 0.85;
+        u.onend = function() {
+          document.getElementById('slotsArea').style.opacity = '1';
+          document.getElementById('letterPool').style.opacity = '1';
+          finishLoadPhrase(letterData, words, phrase, shuffled);
+        };
+        window.speechSynthesis.speak(u);
+        setTimeout(function() {
+          document.getElementById('slotsArea').style.opacity = '1';
+          document.getElementById('letterPool').style.opacity = '1';
+          finishLoadPhrase(letterData, words, phrase, shuffled);
+        }, 2000);
+      } else {
         document.getElementById('slotsArea').style.opacity = '1';
         document.getElementById('letterPool').style.opacity = '1';
         finishLoadPhrase(letterData, words, phrase, shuffled);
-      });
+      }
     });
   }
 function finishLoadPhrase(letterData, words, phrase, shuffled) {
