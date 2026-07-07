@@ -798,15 +798,17 @@ function loadPhrase(idx) {
   // Show intro animation with characters
   const birdName = BIRD_NAMES[currentBird] || currentBird;
   const pigName = PIG_NAMES[currentPig] || currentPig;
-    showIntro('assets/' + currentBird, birdName, 1600, () => {
+  // Single utterance: "Pássaro Vermelho! ... contra ... Porco Verde!"
+    showIntro('assets/' + currentBird, birdName + '! ... ... contra ... ... ' + pigName + '!', 2200, () => {
     document.getElementById('slotsArea').style.opacity = '0';
     document.getElementById('letterPool').style.opacity = '0';
-    showIntro('assets/' + currentPig, pigName, 1600, () => {
+    showIntro('assets/' + currentPig, pigName, 1200, () => {
       document.getElementById('slotsArea').style.opacity = '1';
       document.getElementById('letterPool').style.opacity = '1';
       finishLoadPhrase(letterData, words, phrase, shuffled);
-    });
   });
+});
+}
 function finishLoadPhrase(letterData, words, phrase, shuffled) {
   
   document.querySelectorAll('.slot-character').forEach(el => el.remove());
