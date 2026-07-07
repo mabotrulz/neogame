@@ -793,7 +793,13 @@ function loadPhrase(idx) {
   // Show intro animation with characters
   const birdName = BIRD_NAMES[currentBird] || currentBird;
   const pigName = PIG_NAMES[currentPig] || currentPig;
-    showIntro('assets/' + currentBird, birdName + ' contra ' + pigName, 1600, () => {
+    showIntro('assets/' + currentBird, birdName, 1600, () => {
+    // Speak "contra" in PT between characters
+    if (window.speechSynthesis) {
+      var u = new SpeechSynthesisUtterance('contra');
+      u.lang = 'pt-PT'; u.rate = 0.85; u.pitch = 1.0;
+      window.speechSynthesis.speak(u);
+    }
     document.getElementById('slotsArea').style.opacity = '0';
     document.getElementById('letterPool').style.opacity = '0';
     showIntro('assets/' + currentPig, pigName, 1600, () => {
