@@ -418,6 +418,7 @@ let placedCount = 0, totalLetters = 0, isWin = false;
 let dragData = null, hintTimer = null, pigTimer = null;
 let currentBird = 'red_bird.png', currentPig = 'green_pig.png';
 let phraseOrder = [];
+let _gameStarted = false;
 const HINT_DELAY = 6000;
 
 // Shuffle phrase order
@@ -782,6 +783,12 @@ function loadPhrase(idx) {
   // Prepare shuffled letters
   const shuffled = shuffle(letterData.map(ld => ({ letter: ld.letter, index: ld.index })));
   
+  if (!_gameStarted) {
+    // First load — build everything silently, no intro
+    finishLoadPhrase(letterData, words, phrase, shuffled);
+    return;
+  }
+  
   // Show intro animation with characters
   const birdName = BIRD_NAMES[currentBird] || currentBird;
   const pigName = PIG_NAMES[currentPig] || currentPig;
@@ -1029,7 +1036,10 @@ window.addEventListener('resize', () => { if (!isWin) positionCharacters(); });
 function startLetterGame() {
   document.getElementById('startOverlay').style.opacity = '0';
   setTimeout(() => { document.getElementById('startOverlay').style.display = 'none'; }, 300);
+  _gameStarted = true;
   initAudio();
+  // Restart with intro animation
+  loadPhrase(currentPhraseIdx);
 }
 
 loadPhrase(0);
