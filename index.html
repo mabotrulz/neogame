@@ -447,11 +447,14 @@ function showIntro(imgSrc, name, duration, callback, noSpeak) {
     if (callback) setTimeout(callback, 350);
   }
   if (!noSpeak && window.speechSynthesis && window.speechSynthesis.speak) {
-    window.speechSynthesis.cancel();
+      window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(name + '!');
     u.lang = 'pt-PT'; u.rate = 0.85;
     u.onend = function() { setTimeout(proceed, 300); };
     window.speechSynthesis.speak(u);
+    setTimeout(proceed, duration);
+  } else if (noSpeak) {
+    // Just show, don't speak, don't cancel existing speech
     setTimeout(proceed, duration);
   } else {
     setTimeout(proceed, duration);
@@ -818,8 +821,8 @@ function loadPhrase(idx) {
           document.getElementById('letterPool').style.opacity = '1';
           finishLoadPhrase(letterData, words, phrase, shuffled);
         }
-      });
-    }, true);
+      }, true);
+    });
   }
 function finishLoadPhrase(letterData, words, phrase, shuffled) {
   
