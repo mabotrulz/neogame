@@ -23,31 +23,31 @@
   }
 
   .header {
-    text-align: center; padding: 8px 12px 2px;
+    text-align: center; padding: 10px 12px 4px;
     flex-shrink: 0; position: relative; z-index: 2;
   }
   .header h1 {
-    color: #c0392b; font-size: clamp(12px, 2.5vw, 18px);
-    font-weight: 900; letter-spacing: 1px;
+    color: #c0392b; font-size: clamp(16px, 4vw, 26px);
+    font-weight: 900; letter-spacing: 2px;
   }
   .header .hint {
-    color: #555; font-size: clamp(9px, 1.8vw, 12px);
-    margin-top: 1px; min-height: 16px;
+    color: #444; font-size: clamp(11px, 2.5vw, 16px);
+    margin-top: 2px; min-height: 18px; font-weight: 600;
   }
 
   .stats {
-    display: flex; justify-content: center; gap: 20px;
-    padding: 0 12px 2px; flex-shrink: 0; position: relative; z-index: 2;
+    display: flex; justify-content: center; gap: 28px;
+    padding: 2px 12px 4px; flex-shrink: 0; position: relative; z-index: 2;
   }
   .stats .stat { text-align: center; }
-  .stats .stat .val { font-size: clamp(16px, 3.5vw, 22px); font-weight: 700; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
-  .stats .stat .label { font-size: clamp(7px, 1.5vw, 10px); color: #ddd; text-transform: uppercase; letter-spacing: 1px; }
+  .stats .stat .val { font-size: clamp(22px, 5vw, 32px); font-weight: 700; color: #fff; text-shadow: 1px 1px 3px rgba(0,0,0,0.4); }
+  .stats .stat .label { font-size: clamp(9px, 2vw, 13px); color: #ddd; text-transform: uppercase; letter-spacing: 1px; }
 
   .slots-area {
-    flex: 1;
+    flex: 1.2;
     display: flex; flex-direction: column;
     justify-content: center; align-items: center;
-    padding: 12px 8px 4px;
+    padding: 16px 8px 8px;
     position: relative; z-index: 2;
     min-height: 0;
   }
@@ -55,31 +55,36 @@
   .slots-row {
     display: flex; flex-wrap: wrap;
     justify-content: center; align-items: flex-end;
-    gap: 6px; padding: 8px 4px;
+    gap: 8px; padding: 12px 6px;
     position: relative;
   }
-  .word-group { display: flex; gap: 6px; align-items: flex-end; }
-  .word-group + .word-group::before { content: ''; display: inline-block; width: 12px; }
+  .word-group { display: flex; gap: 8px; align-items: flex-end; }
+  .word-group + .word-group::before { content: ''; display: inline-block; width: 16px; }
+
+  .slot-wrapper {
+    position: relative;
+    width: clamp(40px, 9.5vw, 64px);
+    height: clamp(48px, 11vw, 72px);
+  }
 
   .slot {
-    width: clamp(30px, 7vw, 48px);
-    height: clamp(36px, 8.5vw, 52px);
-    border: 2.5px dashed #fff;
-    border-radius: 8px;
+    width: 100%; height: 100%;
+    border: 3px dashed #fff;
+    border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    font-size: clamp(16px, 4vw, 28px);
+    font-size: clamp(22px, 5.5vw, 38px);
     font-weight: 700; color: #fff;
     transition: all 0.25s;
-    background: rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.12);
   }
   .slot.filled {
     border-style: solid;
-    background: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.25);
     animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
   }
   .slot.wrong {
     border-color: #e74c3c;
-    background: rgba(231,76,60,0.2);
+    background: rgba(231,76,60,0.25);
     animation: shake 0.35s ease;
   }
   .slot.drag-over {
@@ -87,16 +92,19 @@
     background: rgba(241,196,15,0.15);
     transform: scale(1.08);
   }
-  .slot.space { border: none; background: transparent; width: 6px; height: auto; pointer-events: none; }
+  .slot.space { border: none; background: transparent; width: 8px; pointer-events: none; }
 
   @keyframes popIn { 0%{transform:scale(0.7)}100%{transform:scale(1)} }
-  @keyframes shake { 0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)} }
+  @keyframes shake { 0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)} }
 
-  /* Characters on slots */
+  /* Characters */
   .slot-character {
     position: absolute;
     z-index: 5;
     pointer-events: none;
+    width: clamp(36px, 8.5vw, 56px);
+    height: clamp(36px, 8.5vw, 56px);
+    transform: translateX(-50%);
     transition: left 0.4s cubic-bezier(0.34, 1.4, 0.64, 1), top 0.4s ease;
   }
   .slot-character img {
@@ -104,88 +112,77 @@
     object-fit: contain;
     image-rendering: auto;
   }
-  .slot-character.bird {
-    width: clamp(32px, 7vw, 48px);
-    height: clamp(32px, 7vw, 48px);
-  }
+
   .slot-character.bird.hop {
-    animation: charHop 0.35s ease;
+    animation: birdHop 0.35s ease;
   }
-  @keyframes charHop {
+  @keyframes birdHop {
     0%,100% { transform: translateX(-50%) translateY(0); }
-    40% { transform: translateX(-50%) translateY(-10px); }
+    40% { transform: translateX(-50%) translateY(-12px) scaleX(0.85); }
   }
 
-  .slot-character.pig {
-    width: clamp(34px, 7.5vw, 50px);
-    height: clamp(34px, 7.5vw, 50px);
-  }
   .slot-character.pig.idle-jump {
-    animation: pigIdleJump 0.6s ease;
+    animation: pigIdleJump 0.5s ease;
   }
   @keyframes pigIdleJump {
     0%,100% { transform: translateX(-50%) translateY(0); }
-    30% { transform: translateX(-50%) translateY(-8px) scaleX(0.9); }
-    60% { transform: translateX(-50%) translateY(8px) scaleX(1.05); }
+    30% { transform: translateX(-50%) translateY(-10px) scaleX(0.9); }
+    60% { transform: translateX(-50%) translateY(10px) scaleX(1.05); }
   }
+
   .slot-character.pig.scared {
     animation: pigShake 0.5s ease infinite;
   }
   @keyframes pigShake {
     0%,100% { transform: translateX(-50%) translateY(0); }
-    25% { transform: translateX(-50%) translateY(-3px); }
-    75% { transform: translateX(-50%) translateY(3px); }
+    25% { transform: translateX(-50%) translateY(-4px); }
+    75% { transform: translateX(-50%) translateY(4px); }
   }
 
-  /* Flying pig */
   .pig-fly {
     position: fixed; z-index: 200; pointer-events: none;
     left: 50%; top: 50%;
-    transform: translate(-50%, -50%);
     animation: pigGrow 2s cubic-bezier(0.2,0.8,0.3,1) forwards;
   }
-  .pig-fly img {
-    width: 60px; height: 60px;
-    object-fit: contain;
-  }
+  .pig-fly img { width: 80px; height: 80px; object-fit: contain; }
   @keyframes pigGrow {
     0%   { transform: translate(-50%,-50%) scale(0.3) rotate(-10deg); opacity: 0; }
     20%  { opacity: 1; }
-    60%  { transform: translate(-50%,-50%) scale(4) rotate(-3deg); opacity: 1; }
-    80%  { transform: translate(-50%,-50%) scale(4.5) rotate(3deg); opacity: 1; }
-    100% { transform: translate(-50%, calc(50vh + 60vw)) scale(4) rotate(15deg); opacity: 1; }
+    60%  { transform: translate(-50%,-50%) scale(5) rotate(-3deg); opacity: 1; }
+    80%  { transform: translate(-50%,-50%) scale(5.5) rotate(3deg); opacity: 1; }
+    100% { transform: translate(-50%, calc(50vh + 60vw)) scale(5) rotate(15deg); opacity: 1; }
   }
 
   .letter-pool {
     display: flex; flex-wrap: wrap;
-    justify-content: center; gap: 5px;
-    padding: 6px 10px;
-    flex-shrink: 0; min-height: 42px; max-height: 110px;
+    justify-content: center; gap: 6px;
+    padding: 8px 12px;
+    flex-shrink: 0; min-height: 54px; max-height: 140px;
     overflow-y: auto; position: relative; z-index: 2;
   }
   .letter {
-    width: clamp(30px, 7.5vw, 46px);
-    height: clamp(34px, 8vw, 48px);
+    width: clamp(40px, 9.5vw, 62px);
+    height: clamp(46px, 10.5vw, 66px);
     background: linear-gradient(135deg, #e74c3c, #c0392b);
-    color: #fff; font-size: clamp(16px, 4vw, 26px);
-    font-weight: 700; border-radius: 8px;
+    color: #fff; font-size: clamp(22px, 5.5vw, 36px);
+    font-weight: 700; border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
     cursor: grab; touch-action: none;
     transition: transform 0.15s, opacity 0.3s;
-    box-shadow: 0 3px 8px rgba(231,76,60,0.3), inset 0 2px 0 rgba(255,255,255,0.2);
+    box-shadow: 0 4px 12px rgba(231,76,60,0.3), inset 0 2px 0 rgba(255,255,255,0.2);
     border-bottom: 3px solid #a93226;
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
   }
   .letter:active { cursor: grabbing; }
-  .letter:hover { transform: translateY(-2px); }
+  .letter:hover { transform: translateY(-3px); }
   .letter.dragging { opacity: 0.35; transform: scale(0.9); }
   .letter.placed { opacity: 0; pointer-events: none; transform: scale(0.4); }
 
   .feedback {
-    text-align: center; padding: 2px 12px;
-    min-height: 24px; flex-shrink: 0; position: relative; z-index: 2;
+    text-align: center; padding: 4px 12px;
+    min-height: 30px; flex-shrink: 0; position: relative; z-index: 2;
   }
-  .feedback .msg { font-size: clamp(12px,2.5vw,16px); font-weight: 600; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+  .feedback .msg { font-size: clamp(16px, 3.5vw, 24px); font-weight: 700; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
   .feedback .msg.ok { color: #fff; }
   .feedback .msg.fail { color: #e74c3c; }
 
@@ -198,31 +195,24 @@
     transition: opacity 0.5s; padding: 30px; text-align: center;
   }
   .win-overlay.active { opacity: 1; pointer-events: all; }
-  .win-overlay .star { font-size: clamp(40px,12vw,70px); animation: popIn 0.5s ease; }
-  .win-overlay h2 { font-size: clamp(28px,8vw,48px); color: #4ecca3; margin: 4px 0; }
-  .win-overlay .phrase-read { font-size: clamp(22px,6vw,40px); color: #fff; font-weight: 700; letter-spacing: 2px; margin: 4px 0 12px; }
+  .win-overlay .star { font-size: clamp(50px,14vw,80px); animation: popIn 0.5s ease; }
+  .win-overlay h2 { font-size: clamp(36px,10vw,56px); color: #4ecca3; margin: 6px 0; }
+  .win-overlay .phrase-read { font-size: clamp(28px,7vw,48px); color: #fff; font-weight: 700; letter-spacing: 3px; margin: 6px 0 16px; }
   .win-overlay button {
-    padding: 12px 36px; font-size: clamp(14px,3vw,18px); font-weight: 700;
-    background: #4ecca3; color: #1a1a2e; border: none; border-radius: 12px;
-    cursor: pointer; letter-spacing: 1px; transition: transform 0.2s; margin-top: 8px;
+    padding: 14px 44px; font-size: clamp(16px,3.5vw,22px); font-weight: 700;
+    background: #4ecca3; color: #1a1a2e; border: none; border-radius: 14px;
+    cursor: pointer; letter-spacing: 1px; transition: transform 0.2s; margin-top: 10px;
   }
   .win-overlay button:hover { transform: scale(1.05); }
 
   .drag-ghost {
     position: fixed; pointer-events: none; z-index: 200;
-    width: clamp(30px,7.5vw,46px); height: clamp(34px,8vw,48px);
+    width: clamp(40px,9.5vw,62px); height: clamp(46px,10.5vw,66px);
     background: linear-gradient(135deg,#e74c3c,#c0392b); color: #fff;
-    font-size: clamp(16px,4vw,26px); font-weight: 700; border-radius: 8px;
+    font-size: clamp(22px,5.5vw,36px); font-weight: 700; border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
     box-shadow: 0 8px 25px rgba(0,0,0,0.3); transform: translate(-50%,-50%) scale(1.15);
     border-bottom: 3px solid #a93226;
-  }
-
-  @media (max-width: 400px) {
-    .slot { width: clamp(24px,9vw,34px); height: clamp(28px,10vw,38px); font-size: 14px; }
-    .letter { width: clamp(26px,9vw,36px); height: clamp(28px,10vw,38px); font-size: 14px; }
-    .slot-character.bird { width: clamp(26px,8vw,36px); height: clamp(26px,8vw,36px); }
-    .slot-character.pig { width: clamp(28px,8.5vw,38px); height: clamp(28px,8.5vw,38px); }
   }
 </style>
 </head>
@@ -271,17 +261,96 @@ const PHRASES = [
   { text: 'O Mario', hint: 'O papá' },
 ];
 
-const PROVOKES = [
-  'nha nha nha nha',
-  'nha nha nha',
-  'buuuuu',
-  'nhé nhé nhé',
-];
-
 let currentPhraseIdx = 0, score = 0;
 let placedCount = 0, totalLetters = 0, isWin = false;
 let dragData = null, hintTimer = null, pigTimer = null;
 const HINT_DELAY = 6000;
+
+// ===== SOUNDS =====
+let audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playTone(freq, dur, type, vol) {
+  try {
+    const c = getAudioCtx();
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = type || 'sine';
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(vol||0.3, c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur);
+    o.connect(g); g.connect(c.destination);
+    o.start(); o.stop(c.currentTime + dur);
+  } catch(e) {}
+}
+
+function playNoise(dur, vol, lowpass) {
+  try {
+    const c = getAudioCtx();
+    const bufSize = c.sampleRate * dur;
+    const buf = c.createBuffer(1, bufSize, c.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) {
+      d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.25));
+    }
+    const src = c.createBufferSource();
+    src.buffer = buf;
+    const flt = c.createBiquadFilter();
+    flt.type = 'lowpass';
+    flt.frequency.value = lowpass || 400;
+    const gn = c.createGain();
+    gn.gain.setValueAtTime(vol||0.5, c.currentTime);
+    gn.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur);
+    src.connect(flt); flt.connect(gn); gn.connect(c.destination);
+    src.start(); src.stop(c.currentTime + dur);
+  } catch(e) {}
+}
+
+function sfxCorrect() {
+  playTone(523, 0.1, 'triangle', 0.25);
+  setTimeout(() => playTone(659, 0.1, 'triangle', 0.25), 60);
+  setTimeout(() => playTone(784, 0.15, 'triangle', 0.25), 120);
+}
+
+function sfxWrong() {
+  playNoise(0.25, 0.3, 200);
+}
+
+function sfxBirdHop() {
+  playTone(350, 0.08, 'sine', 0.15);
+  setTimeout(() => playTone(500, 0.06, 'sine', 0.1), 40);
+}
+
+function sfxFart() {
+  playNoise(0.25, 0.4, 200 + Math.random() * 150);
+  // Add a low rumble
+  playTone(80, 0.2, 'sawtooth', 0.15);
+}
+
+function sfxHey() {
+  try {
+    const c = getAudioCtx();
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.type = 'square';
+    o.frequency.setValueAtTime(400, c.currentTime);
+    o.frequency.linearRampToValueAtTime(600, c.currentTime + 0.1);
+    o.frequency.linearRampToValueAtTime(300, c.currentTime + 0.2);
+    g.gain.setValueAtTime(0.12, c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.25);
+    o.connect(g); g.connect(c.destination);
+    o.start(); o.stop(c.currentTime + 0.25);
+  } catch(e) {}
+}
+
+function sfxSlide() {
+  playTone(200, 0.3, 'sine', 0.1);
+  setTimeout(() => playTone(150, 0.3, 'sine', 0.1), 100);
+  setTimeout(() => playTone(100, 0.4, 'sine', 0.1), 200);
+}
 
 // Speech
 function speak(text, cb) {
@@ -294,7 +363,7 @@ function speak(text, cb) {
   window.speechSynthesis.speak(u);
 }
 
-function speakLetter(l) {
+function letterName(l) {
   const names = {
     'a':'á','b':'bê','c':'cê','d':'dê','e':'é','f':'éfe','g':'guê','h':'agá',
     'i':'i','j':'jota','k':'cápa','l':'éle','m':'éme','n':'éne','o':'ó',
@@ -305,64 +374,7 @@ function speakLetter(l) {
 }
 
 function speakLetterName(l) {
-  speak(speakLetter(l));
-}
-
-// Fart sound
-function playFart() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const dur = 0.3 + Math.random() * 0.2;
-    
-    // Noise burst
-    const bufSize = ctx.sampleRate * dur;
-    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-    const d = buf.getChannelData(0);
-    for (let i = 0; i < bufSize; i++) {
-      d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufSize * 0.3));
-    }
-    
-    const noise = ctx.createBufferSource();
-    noise.buffer = buf;
-    
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.value = 300 + Math.random() * 200;
-    
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.6, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + dur);
-    
-    noise.connect(filter);
-    filter.connect(gain);
-    gain.connect(ctx.destination);
-    noise.start();
-    noise.stop(ctx.currentTime + dur);
-  } catch(e) {}
-}
-
-// Pig idle
-function pigIdle() {
-  if (isWin || placedCount >= totalLetters) return;
-  const pig = document.getElementById('pigChar');
-  if (!pig || pig.style.display === 'none') return;
-  
-  pig.classList.remove('idle-jump');
-  void pig.offsetWidth;
-  pig.classList.add('idle-jump');
-  
-  // Random sound
-  const roll = Math.random();
-  if (roll < 0.3) {
-    playFart();
-  } else if (roll < 0.7) {
-    const p = PROVOKES[Math.floor(Math.random() * PROVOKES.length)];
-    speak(p);
-  } // else: silent jump
-  
-  // Schedule next
-  clearTimeout(pigTimer);
-  pigTimer = setTimeout(pigIdle, 2000 + Math.random() * 3000);
+  speak(letterName(l));
 }
 
 function shuffle(arr) {
@@ -374,37 +386,38 @@ function shuffle(arr) {
   return a;
 }
 
+// Position characters - fixed centering
 function positionCharacters() {
   const wrappers = document.querySelectorAll('.slot-wrapper');
   const bird = document.getElementById('birdChar');
   const pig = document.getElementById('pigChar');
   if (!wrappers.length) return;
 
-  const lastWrapper = wrappers[wrappers.length - 1];
-  const lastRect = lastWrapper.getBoundingClientRect();
   const areaRect = document.getElementById('slotsArea').getBoundingClientRect();
-  
-  pig.style.left = (lastRect.left - areaRect.left + lastRect.width/2) + 'px';
-  pig.style.top = (lastRect.top - areaRect.top - 6) + 'px';
 
+  // Pig on last wrapper
+  const lastWrap = wrappers[wrappers.length - 1];
+  const lastR = lastWrap.getBoundingClientRect();
+  pig.style.left = (lastR.left + lastR.width / 2 - areaRect.left) + 'px';
+  pig.style.top = (lastR.top - areaRect.top - 8) + 'px';
+
+  // Bird on next unfilled
   let targetIdx = -1;
   wrappers.forEach((w, i) => {
-    if (!w.querySelector('.slot')?.classList.contains('filled') && targetIdx < 0) {
-      targetIdx = i;
-    }
+    if (!w.querySelector('.slot')?.classList.contains('filled') && targetIdx < 0) targetIdx = i;
   });
   if (targetIdx < 0) targetIdx = wrappers.length - 1;
 
-  const targetWrapper = wrappers[targetIdx];
-  const targetRect = targetWrapper.getBoundingClientRect();
-  
-  bird.style.left = (targetRect.left - areaRect.left + targetRect.width/2) + 'px';
-  bird.style.top = (targetRect.top - areaRect.top - 6) + 'px';
-  
+  const targetWrap = wrappers[targetIdx];
+  const targetR = targetWrap.getBoundingClientRect();
+  bird.style.left = (targetR.left + targetR.width / 2 - areaRect.left) + 'px';
+  bird.style.top = (targetR.top - areaRect.top - 8) + 'px';
+
   if (placedCount > 0) {
     bird.classList.remove('hop');
     void bird.offsetWidth;
     bird.classList.add('hop');
+    sfxBirdHop();
   }
 
   if (placedCount / totalLetters > 0.5) {
@@ -414,46 +427,59 @@ function positionCharacters() {
   }
 }
 
+// Idle pig
+function pigIdle() {
+  if (isWin || placedCount >= totalLetters) return;
+  const pig = document.getElementById('pigChar');
+  if (!pig || pig.style.display === 'none') return;
+
+  pig.classList.remove('idle-jump');
+  void pig.offsetWidth;
+  pig.classList.add('idle-jump');
+
+  sfxFart();
+  setTimeout(sfxHey, 100);
+
+  clearTimeout(pigTimer);
+  pigTimer = setTimeout(pigIdle, 2500 + Math.random() * 3000);
+}
+
 // Announce next letter
 function announceNextLetter() {
   if (isWin || placedCount >= totalLetters) return;
   const wrappers = document.querySelectorAll('.slot-wrapper');
-  let nextLetter = null;
   for (const w of wrappers) {
     const slot = w.querySelector('.slot');
     if (!slot.classList.contains('filled')) {
-      nextLetter = slot.dataset.letter;
-      break;
+      const name = letterName(slot.dataset.letter);
+      speak('Encontra a letra ' + name);
+      return;
     }
-  }
-  if (nextLetter) {
-    const name = speakLetter(nextLetter);
-    speak('Encontra a letra ' + name);
   }
 }
 
-// Idle hint fallback
+// Idle hint
 function resetHintTimer() {
   clearTimeout(hintTimer);
   if (isWin) return;
   hintTimer = setTimeout(() => {
     if (isWin || placedCount >= totalLetters) return;
     announceNextLetter();
-    hintTimer = setTimeout(() => announceNextLetter(), HINT_DELAY);
+    hintTimer = setTimeout(announceNextLetter, HINT_DELAY);
   }, HINT_DELAY);
 }
 
 function loadPhrase(idx) {
   const phrase = PHRASES[idx % PHRASES.length];
   const words = phrase.text.split(' ');
-  
+
   const letterData = [];
   words.forEach((word, wi) => {
     for (let li = 0; li < word.length; li++) {
       letterData.push({ letter: word[li], wordIdx: wi, posInWord: li, index: letterData.length });
     }
   });
-  
+
   totalLetters = letterData.length;
   placedCount = 0;
   isWin = false;
@@ -463,11 +489,11 @@ function loadPhrase(idx) {
   document.getElementById('winOverlay').classList.remove('active');
   document.getElementById('feedbackMsg').textContent = '';
   document.getElementById('phraseHint').textContent = phrase.hint || 'Arrasta cada letra';
-  
+
   const oldPig = document.querySelector('.pig-fly');
   if (oldPig) oldPig.remove();
 
-  // Build slots with wrappers
+  // Slots
   const slotsEl = document.getElementById('slotsContainer');
   slotsEl.innerHTML = '';
   let letterIdx = 0;
@@ -480,11 +506,9 @@ function loadPhrase(idx) {
     }
     const group = document.createElement('div');
     group.className = 'word-group';
-    
     for (let li = 0; li < word.length; li++) {
       const wrapper = document.createElement('div');
       wrapper.className = 'slot-wrapper';
-      
       const div = document.createElement('div');
       div.className = 'slot';
       div.dataset.index = letterIdx;
@@ -493,7 +517,6 @@ function loadPhrase(idx) {
       div.addEventListener('dragover', e => { e.preventDefault(); div.classList.add('drag-over'); });
       div.addEventListener('dragleave', () => div.classList.remove('drag-over'));
       div.addEventListener('drop', e => { e.preventDefault(); div.classList.remove('drag-over'); handleDrop(e, letterIdx); });
-      
       wrapper.appendChild(div);
       group.appendChild(wrapper);
       letterIdx++;
@@ -503,7 +526,7 @@ function loadPhrase(idx) {
 
   // Characters
   document.querySelectorAll('.slot-character').forEach(el => el.remove());
-  
+
   const birdDiv = document.createElement('div');
   birdDiv.className = 'slot-character bird';
   birdDiv.id = 'birdChar';
@@ -516,11 +539,9 @@ function loadPhrase(idx) {
   pigDiv.innerHTML = '<img src="assets/green_pig.png" alt="🐷">';
   document.getElementById('slotsArea').appendChild(pigDiv);
 
-  requestAnimationFrame(() => {
-    requestAnimationFrame(positionCharacters);
-  });
+  requestAnimationFrame(() => requestAnimationFrame(positionCharacters));
 
-  // Build letter pool
+  // Letter pool
   const pool = document.getElementById('letterPool');
   pool.innerHTML = '';
   const shuffled = shuffle(letterData.map(ld => ({ letter: ld.letter, index: ld.index })));
@@ -552,10 +573,12 @@ function loadPhrase(idx) {
     div.addEventListener('touchmove', e => {
       e.preventDefault();
       const t = e.touches[0];
-      document.getElementById('dragGhost').style.left = t.clientX + 'px'; document.getElementById('dragGhost').style.top = t.clientY + 'px';
+      document.getElementById('dragGhost').style.left = t.clientX + 'px';
+      document.getElementById('dragGhost').style.top = t.clientY + 'px';
     }, { passive: false });
     div.addEventListener('touchend', e => {
-      div.classList.remove('dragging'); document.getElementById('dragGhost').style.display = 'none';
+      div.classList.remove('dragging');
+      document.getElementById('dragGhost').style.display = 'none';
       const t = e.changedTouches[0];
       const dx = t.clientX - tx, dy = t.clientY - ty;
       if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
@@ -563,7 +586,8 @@ function loadPhrase(idx) {
       let targetIdx = -1;
       slots.forEach(slot => {
         const r = slot.getBoundingClientRect();
-        if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) targetIdx = parseInt(slot.dataset.index);
+        if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom)
+          targetIdx = parseInt(slot.dataset.index);
       });
       if (targetIdx >= 0 && dragData) handleLetterDrop(dragData.letter, dragData.idx, targetIdx);
       dragData = null;
@@ -580,11 +604,7 @@ function loadPhrase(idx) {
 
   updateStats();
   resetHintTimer();
-  
-  // Start pig idle timer
   setTimeout(pigIdle, 2000 + Math.random() * 2000);
-  
-  // Announce first letter
   setTimeout(announceNextLetter, 800);
 }
 
@@ -602,18 +622,17 @@ function handleLetterDrop(letter, origIdx, slotIdx) {
     slotEl.classList.add('filled');
     slotEl.textContent = letter;
     placedCount++;
-    const pool = document.querySelectorAll('.letter');
-    pool.forEach(el => {
-      if (el.textContent === letter && !el.classList.contains('placed') && parseInt(el.dataset.origIdx) === origIdx) el.classList.add('placed');
+    document.querySelectorAll('.letter').forEach(el => {
+      if (el.textContent === letter && !el.classList.contains('placed') && parseInt(el.dataset.origIdx) === origIdx)
+        el.classList.add('placed');
     });
     speakLetterName(letter);
+    sfxCorrect();
     score++;
     showFeedback('✅', 'ok');
     updateStats();
     positionCharacters();
     resetHintTimer();
-    
-    // Announce next letter right away
     setTimeout(announceNextLetter, 600);
 
     if (placedCount === totalLetters) {
@@ -624,6 +643,7 @@ function handleLetterDrop(letter, origIdx, slotIdx) {
   } else {
     slotEl.classList.add('wrong');
     setTimeout(() => slotEl.classList.remove('wrong'), 400);
+    sfxWrong();
     showFeedback('❌', 'fail');
     resetHintTimer();
   }
@@ -632,10 +652,11 @@ function handleLetterDrop(letter, origIdx, slotIdx) {
 function onWin() {
   isWin = true;
   const phrase = PHRASES[currentPhraseIdx % PHRASES.length];
-  
+
   document.getElementById('birdChar').style.display = 'none';
   document.getElementById('pigChar').style.display = 'none';
-  
+  sfxSlide();
+
   const pigFly = document.createElement('div');
   pigFly.className = 'pig-fly';
   pigFly.innerHTML = '<img src="assets/green_pig.png" alt="🐷">';
