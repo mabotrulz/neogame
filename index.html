@@ -473,11 +473,6 @@ function initAudio() {
     const c = getAudioCtx();
     if (c.state === 'suspended') c.resume();
   } catch(e) {}
-  // Also announce first letter on first tap (speech may need user gesture)
-  if (!window._firstLetterSpoken) {
-    window._firstLetterSpoken = true;
-    announceNextLetter();
-  }
 }
 
 // Initialize audio on first user interaction
@@ -798,32 +793,16 @@ function loadPhrase(idx) {
   // Show intro animation with characters
   const birdName = BIRD_NAMES[currentBird] || currentBird;
   const pigName = PIG_NAMES[currentPig] || currentPig;
-  // Show bird name, speak full phrase, then show pig
+  // Show bird → speaks name. Then show pig → speaks "contra Porco Verde!"
     showIntro('assets/' + currentBird, birdName, 2200, function() {
-      // Speak full intro phrase
-      if (window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-        var u = new SpeechSynthesisUtterance(birdName + '! ... contra ... ' + pigName + '!');
-        u.lang = 'pt-PT'; u.rate = 0.85;
-        u.onend = function() {
-          showPigIntro();
-        };
-        window.speechSynthesis.speak(u);
-        setTimeout(showPigIntro, 3000);
-      } else {
-        showPigIntro();
-      }
-    });
-
-    function showPigIntro() {
       document.getElementById('slotsArea').style.opacity = '0';
       document.getElementById('letterPool').style.opacity = '0';
-      showIntro('assets/' + currentPig, pigName, 1200, function() {
+      showIntro('assets/' + currentPig, 'contra ' + pigName, 1200, function() {
         document.getElementById('slotsArea').style.opacity = '1';
         document.getElementById('letterPool').style.opacity = '1';
         finishLoadPhrase(letterData, words, phrase, shuffled);
       });
-    }
+    });
   }
 function finishLoadPhrase(letterData, words, phrase, shuffled) {
   
