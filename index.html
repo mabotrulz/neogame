@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Joga com Neo — Ordenar Palavras</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1a1a2e;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: hidden;
+    touch-action: none;
+    user-select: none;
+  }
+
+  .game {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-width: 800px;
+    background: linear-gradient(135deg, #16213e, #0f3460);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 20px 16px 10px;
+    flex-shrink: 0;
+  }
+  .header h1 {
+    color: #e94560;
+    font-size: clamp(16px, 4vw, 24px);
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .header .subtitle {
+    color: #aaa;
+    font-size: clamp(11px, 2.5vw, 14px);
+    margin-top: 4px;
+  }
+
+  /* Score / progress */
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    padding: 8px 16px;
+    flex-shrink: 0;
+  }
+  .stats .stat {
+    text-align: center;
+  }
+  .stats .stat .val {
+    font-size: clamp(28px, 6vw, 40px);
+    font-weight: 700;
+    color: #fff;
+  }
+  .stats .stat .label {
+    font-size: clamp(10px, 2vw, 12px);
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .stats .stat .val.green { color: #4ecca3; }
+  .stats .stat .val.orange { color: #e94560; }
+
+  /* Phrase display */
+  .phrase-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    gap: 12px;
+    min-height: 0;
+  }
+
+  .phrase-hint {
+    color: #888;
+    font-size: clamp(12px, 2.5vw, 15px);
+    letter-spacing: 1px;
+    text-align: center;
+  }
+
+  .slots {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    padding: 8px;
+    perspective: 800px;
+  }
+
+  .slot {
+    width: clamp(100px, 28vw, 180px);
+    height: clamp(48px, 12vw, 72px);
+    border: 3px dashed #4ecca3;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(18px, 5vw, 32px);
+    font-weight: 700;
+    color: #4ecca3;
+    transition: all 0.3s;
+    position: relative;
+    background: rgba(78, 204, 163, 0.05);
+  }
+  .slot.filled {
+    border-style: solid;
+    background: rgba(78, 204, 163, 0.15);
+    animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .slot.correct {
+    border-color: #4ecca3;
+    background: rgba(78, 204, 163, 0.2);
+  }
+  .slot.wrong-flash {
+    border-color: #e94560;
+    background: rgba(233, 69, 96, 0.15);
+    animation: shake 0.4s ease;
+  }
+  .slot.drag-over {
+    border-color: #ffd700;
+    background: rgba(255, 215, 0, 0.1);
+    transform: scale(1.05);
+  }
+
+  @keyframes popIn {
+    0% { transform: scale(0.7); opacity: 0.5; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-5px); }
+    80% { transform: translateX(5px); }
+  }
+
+  /* Word pool */
+  .word-pool {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px;
+    flex-shrink: 0;
+    min-height: 80px;
+  }
+
+  .word {
+    padding: clamp(10px 20px, 3vw 32px, 14px 28px);
+    background: #4ecca3;
+    color: #1a1a2e;
+    font-size: clamp(16px, 4vw, 26px);
+    font-weight: 700;
+    border-radius: 12px;
+    cursor: grab;
+    touch-action: none;
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.3s;
+    box-shadow: 0 4px 15px rgba(78, 204, 163, 0.3);
+    white-space: nowrap;
+    letter-spacing: 1px;
+  }
+  .word:active { cursor: grabbing; }
+  .word:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(78, 204, 163, 0.4); }
+  .word.dragging {
+    opacity: 0.4;
+    transform: scale(0.95);
+  }
+  .word.placed {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.5);
+  }
+
+  /* Feedback */
+  .feedback {
+    text-align: center;
+    padding: 8px 16px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .feedback .msg {
+    font-size: clamp(14px, 3vw, 20px);
+    color: #ffd700;
+    font-weight: 600;
+  }
+  .feedback .msg.error { color: #e94560; }
+  .feedback .msg.success { color: #4ecca3; }
+
+  /* Win overlay */
+  .win-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 52, 96, 0.92);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s;
+    padding: 40px;
+    text-align: center;
+  }
+  .win-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .win-overlay h2 {
+    font-size: clamp(36px, 10vw, 64px);
+    color: #4ecca3;
+    margin-bottom: 8px;
+  }
+  .win-overlay .phrase-read {
+    font-size: clamp(20px, 5vw, 36px);
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .win-overlay .sub {
+    font-size: clamp(14px, 3vw, 18px);
+    color: #aaa;
+    margin-bottom: 24px;
+  }
+  .win-overlay button {
+    padding: 14px 40px;
+    font-size: clamp(16px, 3vw, 20px);
+    font-weight: 700;
+    background: #4ecca3;
+    color: #1a1a2e;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: transform 0.2s;
+  }
+  .win-overlay button:hover { transform: scale(1.05); }
+
+  .star {
+    font-size: clamp(40px, 12vw, 80px);
+    animation: starPop 0.5s ease;
+    display: inline-block;
+  }
+  @keyframes starPop {
+    0% { transform: scale(0) rotate(-30deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+
+  /* Confetti */
+  .confetti-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 99;
+  }
+  .confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: -10px;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  @media (max-width: 500px) {
+    .slot { width: clamp(80px, 40vw, 140px); height: clamp(42px, 14vw, 56px); }
+    .word { padding: 8px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="game" id="game">
+
+  <div class="header">
+    <h1>📖 Ordenar Palavras</h1>
+    <div class="subtitle">Arrasta as palavras para o sítio certo</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="val" id="scoreDisplay">0</div>
+      <div class="label">Acertadas</div>
+    </div>
+    <div class="stat">
+      <div class="val" id="totalDisplay">0</div>
+      <div class="label">Totais</div>
+    </div>
+    <div class="stat">
+      <div class="val orange" id="streakDisplay">0</div>
+      <div class="label">Seq.</div>
+    </div>
+  </div>
+
+  <div class="phrase-area">
+    <div class="phrase-hint" id="phraseHint">Arrasta cada palavra para o seu lugar</div>
+    <div class="slots" id="slotsContainer"></div>
+  </div>
+
+  <div class="word-pool" id="wordPool"></div>
+
+  <div class="feedback">
+    <div class="msg" id="feedbackMsg"></div>
+  </div>
+
+  <!-- Win overlay -->
+  <div class="win-overlay" id="winOverlay">
+    <div class="star">⭐</div>
+    <h2>Muito bem!</h2>
+    <div class="phrase-read" id="winPhrase"></div>
+    <div class="sub">Completa! 🎉</div>
+    <button onclick="nextPhrase()">Próxima Frase →</button>
+  </div>
+
+  <div class="confetti-container" id="confettiContainer"></div>
+</div>
+
+<script>
+// ===== PHRASES =====
+const PHRASES = [
+  { text: 'Neo Almeida', hint: 'O nome do menino mais esperto' },
+  { text: 'Ola mundo', hint: 'A primeira frase de todos' },
+  { text: 'Bom dia sol', hint: 'Uma saudação alegre' },
+  { text: 'Gosto de jogar', hint: 'O que tu mais gostas de fazer?' },
+  { text: 'A minha mae', hint: 'A pessoa que te ama mais' },
+  { text: 'O meu pai', hint: 'O melhor amigo' },
+  { text: 'Vamos brincar', hint: 'Um convite divertido' },
+  { text: 'A escola e fixe', hint: 'O sítio onde aprendes' },
+  { text: 'A Andreia e a mae', hint: 'O nome da mãe do Neo' },
+  { text: 'O Mario e o pai', hint: 'O nome do pai do Neo' },
+];
+
+let currentPhraseIdx = 0;
+let score = 0;
+let total = 0;
+let streak = 0;
+let slots = [];
+let wordsPlaced = 0;
+let isWin = false;
+
+// Speech
+function speak(text, callback) {
+  if (!window.speechSynthesis) { if (callback) callback(); return; }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'pt-PT';
+  u.rate = 0.85;
+  u.pitch = 1.1;
+  u.onend = () => { if (callback) callback(); };
+  u.onerror = () => { if (callback) callback(); };
+  window.speechSynthesis.speak(u);
+}
+
+function speakWord(word) {
+  speak(word);
+}
+
+// Shuffle array
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Start a phrase
+function loadPhrase(idx) {
+  const phrase = PHRASES[idx % PHRASES.length];
+  const words = phrase.text.split(' ');
+  
+  // Reset state
+  slots = words.map((w, i) => ({ word: w, index: i, filled: false }));
+  wordsPlaced = 0;
+  isWin = false;
+  document.getElementById('winOverlay').classList.remove('active');
+  document.getElementById('confettiContainer').innerHTML = '';
+  document.getElementById('feedbackMsg').textContent = '';
+  document.getElementById('phraseHint').textContent = phrase.hint || 'Arrasta cada palavra para o seu lugar';
+
+  // Build slots
+  const slotsEl = document.getElementById('slotsContainer');
+  slotsEl.innerHTML = '';
+  slots.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'slot';
+    div.dataset.index = i;
+    div.textContent = '';
+    div.addEventListener('dragover', e => { e.preventDefault(); div.classList.add('drag-over'); });
+    div.addEventListener('dragleave', () => div.classList.remove('drag-over'));
+    div.addEventListener('drop', e => { e.preventDefault(); div.classList.remove('drag-over'); handleDrop(e, i); });
+    // Touch drop
+    div.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+    div.addEventListener('touchend', e => handleTouchDrop(e, i));
+    slotsEl.appendChild(div);
+  });
+
+  // Build word pool (shuffled)
+  const pool = document.getElementById('wordPool');
+  pool.innerHTML = '';
+  const shuffled = shuffle(words);
+  shuffled.forEach((w, i) => {
+    const div = document.createElement('div');
+    div.className = 'word';
+    div.draggable = true;
+    div.textContent = w;
+    div.dataset.word = w;
+    div.dataset.poolIdx = i;
+    
+    div.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('text/plain', w);
+      div.classList.add('dragging');
+    });
+    div.addEventListener('dragend', () => div.classList.remove('dragging'));
+    
+    // Touch drag
+    let touchStartX, touchStartY;
+    div.addEventListener('touchstart', e => {
+      const t = e.touches[0];
+      touchStartX = t.clientX;
+      touchStartY = t.clientY;
+      div.dataset.touchWord = w;
+      div.classList.add('dragging');
+    }, { passive: true });
+    div.addEventListener('touchmove', e => {
+      e.preventDefault();
+    }, { passive: false });
+    div.addEventListener('touchend', e => {
+      div.classList.remove('dragging');
+      const t = e.changedTouches[0];
+      const dx = t.clientX - touchStartX;
+      const dy = t.clientY - touchStartY;
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return; // tap, not drag
+      // Find which slot we dropped on
+      const slotsEls = document.querySelectorAll('.slot');
+      let droppedOn = -1;
+      slotsEls.forEach((el, i) => {
+        const r = el.getBoundingClientRect();
+        if (t.clientX >= r.left && t.clientX <= r.right && t.clientY >= r.top && t.clientY <= r.bottom) {
+          droppedOn = i;
+        }
+      });
+      if (droppedOn >= 0) {
+        handleWordDrop(div.dataset.touchWord || w, droppedOn);
+      }
+      touchStartX = touchStartY = null;
+    }, { passive: true });
+    
+    // Click fallback
+    div.addEventListener('click', () => {
+      // Find first empty slot
+      const slotsEls = document.querySelectorAll('.slot');
+      for (let i = 0; i < slotsEls.length; i++) {
+        if (!slots[i].filled) {
+          handleWordDrop(w, i);
+          break;
+        }
+      }
+    });
+    
+    pool.appendChild(div);
+  });
+
+  // Update displays
+  updateStats();
+  document.getElementById('totalDisplay').textContent = PHRASES.length;
+}
+
+function handleDrop(e, slotIdx) {
+  const word = e.dataTransfer.getData('text/plain');
+  if (!word) return;
+  handleWordDrop(word, slotIdx);
+}
+
+function handleTouchDrop(e, slotIdx) {
+  // Handled in touchend on word
+}
+
+function handleWordDrop(word, slotIdx) {
+  if (isWin) return;
+  const slot = slots[slotIdx];
+  if (slot.filled) {
+    showFeedback('Este lugar já está preenchido!', 'error');
+    return;
+  }
+
+  // Check if word matches
+  const slotEl = document.querySelectorAll('.slot')[slotIdx];
+  if (word === slot.word) {
+    // Correct!
+    slot.filled = true;
+    wordsPlaced++;
+    slotEl.className = 'slot filled correct';
+    slotEl.textContent = word;
+    
+    // Hide the word from pool
+    const poolWords = document.querySelectorAll('.word');
+    poolWords.forEach(el => {
+      if (el.textContent === word && !el.classList.contains('placed')) {
+        el.classList.add('placed');
+      }
+    });
+
+    // Play word pronunciation
+    speakWord(word);
+    
+    score++;
+    streak++;
+    showFeedback('✅ Boa!', 'success');
+    updateStats();
+
+    // Check if all placed
+    if (wordsPlaced === slots.length) {
+      setTimeout(() => onWin(), 600);
+    }
+  } else {
+    // Wrong — flash and reject
+    slotEl.className = 'slot wrong-flash';
+    setTimeout(() => { slotEl.className = 'slot'; }, 500);
+    streak = 0;
+    showFeedback('❌ Tenta outra vez!', 'error');
+    updateStats();
+  }
+}
+
+function onWin() {
+  isWin = true;
+  const phrase = PHRASES[currentPhraseIdx % PHRASES.length];
+  document.getElementById('winPhrase').textContent = phrase.text;
+  document.getElementById('winOverlay').classList.add('active');
+  
+  // Confetti
+  spawnConfetti();
+  
+  // Read the full phrase
+  setTimeout(() => {
+    speak(phrase.text);
+  }, 500);
+}
+
+function spawnConfetti() {
+  const container = document.getElementById('confettiContainer');
+  const colors = ['#4ecca3', '#e94560', '#ffd700', '#ff6b9d', '#00d2ff', '#a29bfe'];
+  for (let i = 0; i < 60; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.style.left = Math.random() * 100 + '%';
+    el.style.background = colors[Math.floor(Math.random() * colors.length)];
+    el.style.width = (Math.random() * 8 + 4) + 'px';
+    el.style.height = (Math.random() * 8 + 4) + 'px';
+    el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    el.style.animationDuration = (Math.random() * 2 + 2) + 's';
+    el.style.animationDelay = (Math.random() * 1.5) + 's';
+    container.appendChild(el);
+  }
+}
+
+function nextPhrase() {
+  currentPhraseIdx++;
+  loadPhrase(currentPhraseIdx);
+}
+
+function showFeedback(msg, type) {
+  const el = document.getElementById('feedbackMsg');
+  el.textContent = msg;
+  el.className = 'msg' + (type === 'error' ? ' error' : type === 'success' ? ' success' : '');
+  clearTimeout(el._timeout);
+  el._timeout = setTimeout(() => {
+    if (el.textContent === msg) el.textContent = '';
+  }, 2000);
+}
+
+function updateStats() {
+  document.getElementById('scoreDisplay').textContent = score;
+  document.getElementById('totalDisplay').textContent = PHRASES.length;
+  document.getElementById('streakDisplay').textContent = streak;
+}
+
+// Init
+loadPhrase(0);
+</script>
+</body>
+</html>
