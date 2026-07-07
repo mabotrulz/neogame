@@ -153,6 +153,54 @@
     100% { transform: translate(-50%, calc(50vh + 60vw)) scale(5) rotate(15deg); opacity: 1; }
   }
 
+  /* Explosion */
+  .explosion {
+    position: fixed; z-index: 190; pointer-events: none;
+    left: 50%; top: 50%;
+    animation: explBoom 0.6s ease forwards;
+  }
+  @keyframes explBoom {
+    0% { transform: translate(-50%,-50%) scale(0); opacity: 0; }
+    20% { transform: translate(-50%,-50%) scale(0.5); opacity: 1; }
+    50% { transform: translate(-50%,-50%) scale(2); opacity: 1; }
+    100% { transform: translate(-50%,-50%) scale(3); opacity: 0; }
+  }
+  .explosion-ring {
+    position: fixed; z-index: 189; pointer-events: none;
+    left: 50%; top: 50%;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 6px solid #f39c12;
+    animation: explRing 0.7s ease forwards;
+  }
+  @keyframes explRing {
+    0% { transform: translate(-50%,-50%) scale(0); opacity: 1; }
+    100% { transform: translate(-50%,-50%) scale(8); opacity: 0; }
+  }
+  .explosion-ring:nth-child(2) { border-color: #e74c3c; animation-delay: 0.1s; }
+  .explosion-ring:nth-child(3) { border-color: #f1c40f; animation-delay: 0.2s; }
+  .explosion-particle {
+    position: fixed; z-index: 188; pointer-events: none;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    animation: explParticle 0.8s ease forwards;
+  }
+  @keyframes explParticle {
+    0% { opacity: 1; transform: translate(0,0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--dx),var(--dy)) scale(0); }
+  }
+
+  /* Flash */
+  .flash {
+    position: fixed; inset: 0; z-index: 180; pointer-events: none;
+    background: #fff;
+    animation: flashFade 0.3s ease forwards;
+  }
+  @keyframes flashFade {
+    0% { opacity: 0.8; }
+    100% { opacity: 0; }
+  }
+
   .letter-pool {
     display: flex; flex-wrap: wrap;
     justify-content: center; gap: 6px;
@@ -326,30 +374,45 @@ function sfxBirdHop() {
 
 function sfxFart() {
   playNoise(0.25, 0.4, 200 + Math.random() * 150);
-  // Add a low rumble
   playTone(80, 0.2, 'sawtooth', 0.15);
 }
 
 function sfxHey() {
   try {
     const c = getAudioCtx();
+    if (c.state === 'suspended') c.resume();
     const o = c.createOscillator();
     const g = c.createGain();
     o.type = 'square';
     o.frequency.setValueAtTime(400, c.currentTime);
-    o.frequency.linearRampToValueAtTime(600, c.currentTime + 0.1);
-    o.frequency.linearRampToValueAtTime(300, c.currentTime + 0.2);
-    g.gain.setValueAtTime(0.12, c.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.25);
+    o.frequency.linearRampToValueAtTime(650, c.currentTime + 0.08);
+    o.frequency.linearRampToValueAtTime(350, c.currentTime + 0.2);
+    g.gain.setValueAtTime(0.3, c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.3);
     o.connect(g); g.connect(c.destination);
-    o.start(); o.stop(c.currentTime + 0.25);
+    o.start(); o.stop(c.currentTime + 0.3);
   } catch(e) {}
 }
 
-function sfxSlide() {
-  playTone(200, 0.3, 'sine', 0.1);
-  setTimeout(() => playTone(150, 0.3, 'sine', 0.1), 100);
-  setTimeout(() => playTone(100, 0.4, 'sine', 0.1), 200);
+function sfxExplosion() {
+  try {
+    const c = getAudioCtx();
+    if (c.state === 'suspended') c.resume();
+    // Noise burst
+    playNoise(0.5, 0.7, 800);
+    // Low boom
+    playTone(60, 0.5, 'sawtooth', 0.4);
+    // High shatter
+    setTimeout(() => playNoise(0.3, 0.4, 3000), 50);
+    setTimeout(() => playTone(120, 0.3, 'square', 0.2), 80);
+  } catch(e) {}
+}
+
+function sfxFall() {
+  playTone(140, 0.15, 'sine', 0.15);
+  setTimeout(() => playTone(110, 0.15, 'sine', 0.12), 80);
+  setTimeout(() => playTone(80, 0.15, 'sine', 0.1), 160);
+  setTimeout(() => playNoise(0.15, 0.35, 120), 250);
 }
 
 // Speech
@@ -655,19 +718,64 @@ function onWin() {
 
   document.getElementById('birdChar').style.display = 'none';
   document.getElementById('pigChar').style.display = 'none';
-  sfxSlide();
+  
+  // Explosion!
+  sfxExplosion();
+  
+  // Flash
+  const flash = document.createElement('div');
+  flash.className = 'flash';
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 400);
+  
+  // Explosion rings
+  for (let i = 0; i < 3; i++) {
+    const ring = document.createElement('div');
+    ring.className = 'explosion-ring';
+    document.body.appendChild(ring);
+    setTimeout(() => ring.remove(), 1000);
+  }
+  
+  // Explosion center burst
+  const boom = document.createElement('div');
+  boom.className = 'explosion';
+  boom.textContent = '💥';
+  boom.style.fontSize = '100px';
+  document.body.appendChild(boom);
+  setTimeout(() => boom.remove(), 800);
+  
+  // Particles
+  const colors = ['#f39c12','#e74c3c','#f1c40f','#e67e22','#ff6b9d'];
+  for (let i = 0; i < 15; i++) {
+    const p = document.createElement('div');
+    p.className = 'explosion-particle';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.setProperty('--dx', ((Math.random() - 0.5) * 400) + 'px');
+    p.style.setProperty('--dy', ((Math.random() - 0.5) * 400) + 'px');
+    p.style.animationDelay = (Math.random() * 0.2) + 's';
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1200);
+  }
 
-  const pigFly = document.createElement('div');
-  pigFly.className = 'pig-fly';
-  pigFly.innerHTML = '<img src="assets/green_pig.png" alt="🐷">';
-  document.body.appendChild(pigFly);
-
+  // Pig flies after explosion
   setTimeout(() => {
-    pigFly.remove();
-    document.getElementById('winPhrase').textContent = phrase.text;
-    document.getElementById('winOverlay').classList.add('active');
-    speak(phrase.text);
-  }, 2500);
+    const pigFly = document.createElement('div');
+    pigFly.className = 'pig-fly';
+    pigFly.innerHTML = '<img src="assets/green_pig.png" alt="🐷">';
+    document.body.appendChild(pigFly);
+
+    // Fall sound at the end of the slide
+    setTimeout(() => {
+      sfxFall();
+    }, 1900);
+
+    setTimeout(() => {
+      pigFly.remove();
+      document.getElementById('winPhrase').textContent = phrase.text;
+      document.getElementById('winOverlay').classList.add('active');
+      speak(phrase.text);
+    }, 2500);
+  }, 600);
 }
 
 function nextPhrase() {
