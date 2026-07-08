@@ -800,28 +800,17 @@ function loadPhrase(idx) {
     showIntro('assets/' + currentBird, birdName, 2200, function() {
       document.getElementById('slotsArea').style.opacity = '0';
       document.getElementById('letterPool').style.opacity = '0';
-      showIntro('assets/' + currentPig, pigName, 1500, function() {
-        // Pig visible — now speak "contra Porco Verde!"
-        if (window.speechSynthesis) {
-          var u = new SpeechSynthesisUtterance('contra ' + pigName + '!');
-          u.lang = 'pt-PT'; u.rate = 0.85;
-          u.onend = function() {
-            document.getElementById('slotsArea').style.opacity = '1';
-            document.getElementById('letterPool').style.opacity = '1';
-            finishLoadPhrase(letterData, words, phrase, shuffled);
-          };
-          window.speechSynthesis.speak(u);
-          setTimeout(function() {
-            document.getElementById('slotsArea').style.opacity = '1';
-            document.getElementById('letterPool').style.opacity = '1';
-            finishLoadPhrase(letterData, words, phrase, shuffled);
-          }, 2500);
-        } else {
-          document.getElementById('slotsArea').style.opacity = '1';
-          document.getElementById('letterPool').style.opacity = '1';
-          finishLoadPhrase(letterData, words, phrase, shuffled);
-        }
+      showIntro('assets/' + currentPig, pigName, 2500, function() {
+        document.getElementById('slotsArea').style.opacity = '1';
+        document.getElementById('letterPool').style.opacity = '1';
+        finishLoadPhrase(letterData, words, phrase, shuffled);
       }, true);
+      // Speak "contra" immediately while pig is visible
+      if (window.speechSynthesis) {
+        var u = new SpeechSynthesisUtterance('contra ' + pigName + '!');
+        u.lang = 'pt-PT'; u.rate = 0.85;
+        window.speechSynthesis.speak(u);
+      }
     });
   }
 function finishLoadPhrase(letterData, words, phrase, shuffled) {
