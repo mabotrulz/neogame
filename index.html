@@ -537,25 +537,13 @@ function sfxBirdHop() {
 }
 
 function sfxFart() {
-  playNoise(0.25, 0.4, 200 + Math.random() * 150);
-  playTone(80, 0.2, 'sawtooth', 0.15);
+  try { new Audio('assets/pig_fart.wav').play(); } catch(e) {}
 }
-
-function sfxHey() {
-  try {
-    const c = getAudioCtx();
-    if (c.state === 'suspended') c.resume();
-    const o = c.createOscillator();
-    const g = c.createGain();
-    o.type = 'square';
-    o.frequency.setValueAtTime(400, c.currentTime);
-    o.frequency.linearRampToValueAtTime(650, c.currentTime + 0.08);
-    o.frequency.linearRampToValueAtTime(350, c.currentTime + 0.2);
-    g.gain.setValueAtTime(0.3, c.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.3);
-    o.connect(g); g.connect(c.destination);
-    o.start(); o.stop(c.currentTime + 0.3);
-  } catch(e) {}
+function sfxProvoke() {
+  try { new Audio('assets/pig_laugh.wav').play(); } catch(e) {}
+}
+function sfxPig() {
+  try { new Audio('assets/pig_snort.wav').play(); } catch(e) {}
 }
 
 function sfxExplosion(type) {
@@ -693,8 +681,10 @@ function pigIdle() {
   void pig.offsetWidth;
   pig.classList.add('idle-jump');
 
-  sfxFart();
-  setTimeout(sfxHey, 100);
+  var r = Math.random();
+  if (r < 0.33) sfxFart();
+  else if (r < 0.66) sfxProvoke();
+  else sfxPig();
 
   clearTimeout(pigTimer);
   pigTimer = setTimeout(pigIdle, 2500 + Math.random() * 3000);
