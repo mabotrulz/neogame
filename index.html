@@ -357,9 +357,9 @@
   <div class="win-overlay" id="winOverlay">
     <div class="star">⭐</div>
     <div class="win-chars">
-      <img src="assets/red_bird.png" class="bird-win" id="winBird" alt="🐦">
+      <img src="assets/red_bird.png" class="bird-win" id="winBird" alt="Bird">
       <div class="vs">⚔️</div>
-      <img src="assets/green_pig.png" class="pig-defeated" id="winPig" alt="🐷">
+      <img src="assets/green_pig.png" class="pig-defeated" id="winPig" alt="Pig">
     </div>
     <h2>Muito bem!</h2>
     <div class="phrase-read" id="winPhrase"></div>
@@ -810,7 +810,7 @@ function finishLoadPhrase(letterData, words, phrase, shuffled) {
   const birdDiv = document.createElement('div');
   birdDiv.className = 'slot-character bird';
   birdDiv.id = 'birdChar';
-  birdDiv.innerHTML = '<img src="assets/' + currentBird + '" alt="🐦">';
+  birdDiv.innerHTML = '<img src="assets/' + currentBird + '" alt="Bird">';
   document.getElementById('slotsArea').appendChild(birdDiv);
 
   const pigDiv = document.createElement('div');
