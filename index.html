@@ -546,6 +546,10 @@ function sfxPig() {
   try { new Audio('assets/pig_snort.wav').play(); } catch(e) {}
 }
 
+function sfxPigHurt() {
+  try { new Audio('assets/pig_hurt' + (Math.random()<0.5?1:2) + '.wav').play(); } catch(e) {}
+}
+
 function sfxExplosion(type) {
   try {
     const c = getAudioCtx();
@@ -944,6 +948,7 @@ function onWin() {
   // Random explosion type
   const expType = Math.floor(Math.random() * 3);
   sfxExplosion(expType);
+  setTimeout(sfxPigHurt, 200);
   
   // Clear old explosions
   document.querySelectorAll('.explosion-ring,.explosion-particle,.flash,.explosion').forEach(el => el.remove());
