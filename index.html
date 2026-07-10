@@ -532,8 +532,7 @@ function sfxWrong() {
 }
 
 function sfxBirdHop() {
-  playTone(350, 0.08, 'sine', 0.15);
-  setTimeout(() => playTone(500, 0.06, 'sine', 0.1), 40);
+  try { new Audio('assets/bird_chirp.wav').play(); } catch(e) {}
 }
 
 function sfxFart() {
